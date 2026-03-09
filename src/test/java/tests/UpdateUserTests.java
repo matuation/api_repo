@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static specs.login.LoginSpec.loginRequestSpec;
+import static specs.login.LoginSpec.requestSpec;
 import static specs.login.LoginSpec.successfulLoginResponseSpec;
-import static specs.registration.RegistrationSpec.SuccessfulRegistrationResponseSpec;
+import static specs.registration.RegistrationSpec.successfulRegistrationResponseSpec;
 import static specs.update.UpdateUserSpec.*;
 
 public class UpdateUserTests extends TestBase {
@@ -57,12 +57,12 @@ public class UpdateUserTests extends TestBase {
     public void successfulUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -71,7 +71,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -83,7 +83,7 @@ public class UpdateUserTests extends TestBase {
 
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(username, firstName, lastName, email);
 
-        SuccessfulPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        SuccessfulPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -113,18 +113,18 @@ public class UpdateUserTests extends TestBase {
     public void wrongExceedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -137,7 +137,7 @@ public class UpdateUserTests extends TestBase {
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(forbiddenUsername, exceededLengthUsername,
                 exceededLengthUsername, forbiddenExceededEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -170,18 +170,18 @@ public class UpdateUserTests extends TestBase {
     public void wrongEmailFormatUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -194,7 +194,7 @@ public class UpdateUserTests extends TestBase {
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(forbiddenUsername, exceededLengthUsername,
                 exceededLengthUsername, forbiddenEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -224,18 +224,18 @@ public class UpdateUserTests extends TestBase {
     public void noFieldsProvidedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -247,7 +247,7 @@ public class UpdateUserTests extends TestBase {
 
         EmptyPutUpdateBodyModel putUpdateBody = new EmptyPutUpdateBodyModel();
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -277,18 +277,18 @@ public class UpdateUserTests extends TestBase {
     public void emptyFieldsProvidedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -301,7 +301,7 @@ public class UpdateUserTests extends TestBase {
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(emptyUsername, emptyFirstName,
                 emptyLastName, emptyEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -324,18 +324,18 @@ public class UpdateUserTests extends TestBase {
     public void onlyUsernameUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -347,7 +347,7 @@ public class UpdateUserTests extends TestBase {
 
         OnlyUsernamePutUpdateBodyModel putUpdateBody = new OnlyUsernamePutUpdateBodyModel(username);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(loginRequestSpec)
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -374,12 +374,12 @@ public class UpdateUserTests extends TestBase {
     public void successfulAllFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -388,7 +388,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -400,7 +400,7 @@ public class UpdateUserTests extends TestBase {
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(username, firstName, lastName, email);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -430,12 +430,12 @@ public class UpdateUserTests extends TestBase {
     public void onlyUsernameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -444,7 +444,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -456,7 +456,7 @@ public class UpdateUserTests extends TestBase {
 
         OnlyUsernamePatchUpdateBodyModel patchUpdateBody = new OnlyUsernamePatchUpdateBodyModel(username);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -486,12 +486,12 @@ public class UpdateUserTests extends TestBase {
     public void onlyFirstNameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -500,7 +500,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -512,7 +512,7 @@ public class UpdateUserTests extends TestBase {
 
         OnlyFirstNamePatchUpdateBodyModel patchUpdateBody = new OnlyFirstNamePatchUpdateBodyModel(firstName);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -542,12 +542,12 @@ public class UpdateUserTests extends TestBase {
     public void onlyLastNameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -556,7 +556,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -568,7 +568,7 @@ public class UpdateUserTests extends TestBase {
 
         OnlyLastNamePatchUpdateBodyModel patchUpdateBody = new OnlyLastNamePatchUpdateBodyModel(lastName);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -599,12 +599,12 @@ public class UpdateUserTests extends TestBase {
     public void onlyEmailUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -613,7 +613,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -625,7 +625,7 @@ public class UpdateUserTests extends TestBase {
 
         OnlyEmailPatchUpdateBodyModel patchUpdateBody = new OnlyEmailPatchUpdateBodyModel(email);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -655,18 +655,18 @@ public class UpdateUserTests extends TestBase {
     public void exceedAndWrongFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -678,7 +678,7 @@ public class UpdateUserTests extends TestBase {
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(forbiddenExceededUsername, forbiddenExceededUsername, forbiddenExceededUsername, forbiddenExceededEmail);
 
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -714,18 +714,18 @@ public class UpdateUserTests extends TestBase {
     public void emptyFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -737,7 +737,7 @@ public class UpdateUserTests extends TestBase {
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(emptyUsername, emptyFirstName, emptyLastName, emptyEmail);
 
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
@@ -759,12 +759,12 @@ public class UpdateUserTests extends TestBase {
     public void wrongNoFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -773,7 +773,7 @@ public class UpdateUserTests extends TestBase {
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -785,7 +785,7 @@ public class UpdateUserTests extends TestBase {
 
         EmptyPatchUpdateBodyModel patchUpdateBody = new EmptyPatchUpdateBodyModel();
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(loginRequestSpec)
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()

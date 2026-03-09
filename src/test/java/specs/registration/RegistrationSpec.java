@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public class RegistrationSpec {
 
 
-    public static ResponseSpecification SuccessfulRegistrationResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification successfulRegistrationResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(201)
             .expectBody(matchesJsonSchemaInClasspath("schemas/registration/successful_registration_response_schema.json"))
@@ -19,14 +19,14 @@ public class RegistrationSpec {
             .expectBody("remoteAddr", notNullValue())
             .build();
 
-    public static ResponseSpecification WrongUsernameRegistrationResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification wrongUsernameRegistrationResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(400)
             .expectBody(matchesJsonSchemaInClasspath("schemas/registration/wrong_username_registration_response_schema.json"))
             .expectBody("username", notNullValue())
             .build();
 
-    public static ResponseSpecification WrongUsernameAndPasswordRegistrationResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification wrongUsernameAndPasswordRegistrationResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(400)
             .expectBody(matchesJsonSchemaInClasspath("schemas/registration/wrong_username_and_password_registration_response_schema.json"))

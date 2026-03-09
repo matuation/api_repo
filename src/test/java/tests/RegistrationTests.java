@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static specs.login.LoginSpec.loginRequestSpec;
+import static specs.login.LoginSpec.requestSpec;
 import static specs.registration.RegistrationSpec.*;
 
 public class RegistrationTests extends TestBase {
@@ -38,12 +38,12 @@ public class RegistrationTests extends TestBase {
     public void successfulRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
@@ -63,23 +63,23 @@ public class RegistrationTests extends TestBase {
     public void existingUserWrongRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel firstRegistrationResponse = given(loginRequestSpec)
+        SuccessfulRegistrationResponseModel firstRegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(SuccessfulRegistrationResponseSpec)
+                .spec(successfulRegistrationResponseSpec)
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
 
         assertThat(firstRegistrationResponse.username()).isEqualTo(username);
 
-        WrongUserResponseModel secondRegistrationResponse = given(loginRequestSpec)
+        WrongUserResponseModel secondRegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameRegistrationResponseSpec)
+                .spec(wrongUsernameRegistrationResponseSpec)
                 .extract()
                 .as(WrongUserResponseModel.class);
 
@@ -93,12 +93,12 @@ public class RegistrationTests extends TestBase {
     public void forbiddenUsernameRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(forbiddenUsername, password);
 
-        WrongUserResponseModel registrationResponse = given(loginRequestSpec)
+        WrongUserResponseModel registrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameRegistrationResponseSpec)
+                .spec(wrongUsernameRegistrationResponseSpec)
                 .extract()
                 .as(WrongUserResponseModel.class);
 
@@ -112,12 +112,12 @@ public class RegistrationTests extends TestBase {
     public void exceededUsernameAndPasswordRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(exceededLengthUsername, exceededLengthPassword);
 
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(loginRequestSpec)
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameAndPasswordRegistrationResponseSpec)
+                .spec(wrongUsernameAndPasswordRegistrationResponseSpec)
                 .extract()
                 .as(WrongUsernameAndPasswordRegistrationResponseModel.class);
 
@@ -134,12 +134,12 @@ public class RegistrationTests extends TestBase {
     public void emptyUsernameAndPasswordRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(emptyUsername, emptyPassword);
 
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(loginRequestSpec)
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameAndPasswordRegistrationResponseSpec)
+                .spec(wrongUsernameAndPasswordRegistrationResponseSpec)
                 .extract()
                 .as(WrongUsernameAndPasswordRegistrationResponseModel.class);
 
@@ -156,12 +156,12 @@ public class RegistrationTests extends TestBase {
     public void nullUsernameAndPasswordRegistrationTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(nullUsername, nullPassword);
 
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(loginRequestSpec)
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameAndPasswordRegistrationResponseSpec)
+                .spec(wrongUsernameAndPasswordRegistrationResponseSpec)
                 .extract()
                 .as(WrongUsernameAndPasswordRegistrationResponseModel.class);
 
@@ -178,12 +178,12 @@ public class RegistrationTests extends TestBase {
     public void noUsernameAndPasswordRegistrationTest() {
         NoUsernameAndPasswordRegistrationRequestModel registrationData = new NoUsernameAndPasswordRegistrationRequestModel();
 
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(loginRequestSpec)
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
-                .spec(WrongUsernameAndPasswordRegistrationResponseSpec)
+                .spec(wrongUsernameAndPasswordRegistrationResponseSpec)
                 .extract()
                 .as(WrongUsernameAndPasswordRegistrationResponseModel.class);
 

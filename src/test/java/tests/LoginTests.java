@@ -23,7 +23,7 @@ public class LoginTests extends TestBase {
     public void successfulLoginTest() {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -45,7 +45,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsLoginTest() {
         LoginBodyModel loginData = new LoginBodyModel(username, wrongPassword);
 
-        WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        WrongCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -64,7 +64,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsPasswordTest() {
         LoginBodyModel loginData = new LoginBodyModel(wrongUsername, password);
 
-        WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        WrongCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -83,7 +83,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsNameAndPasswordTest() {
         LoginBodyModel loginData = new LoginBodyModel(wrongUsername, wrongPassword);
 
-        WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        WrongCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -102,7 +102,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsWrongFormatTest() {
         WrongDataFormatLoginBodyModel loginData = new WrongDataFormatLoginBodyModel(wrongFormat, wrongFormat);
 
-        WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        WrongCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -121,7 +121,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsEmptyStringTest() {
         LoginBodyModel loginData = new LoginBodyModel(emptyString, emptyString);
 
-        EmptyCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        EmptyCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -143,7 +143,7 @@ public class LoginTests extends TestBase {
     public void wrongCredentialsNullTest() {
         LoginBodyModel loginData = new LoginBodyModel(nullString, nullString);
 
-        EmptyCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        EmptyCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -164,7 +164,7 @@ public class LoginTests extends TestBase {
     public void noCredentialsNullTest() {
         NoCredentialsLoginResponseModel loginData = new NoCredentialsLoginResponseModel();
 
-        EmptyCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
+        EmptyCredentialsLoginResponseModel loginResponse = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")

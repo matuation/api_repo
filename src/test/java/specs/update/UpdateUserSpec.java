@@ -80,7 +80,7 @@ public class UpdateUserSpec {
             .log(ALL)
             .expectStatusCode(400)
             .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/putUpdate/wrong_or_no_fields_patch_update_response_schema.json"))
+                    "schemas/putUpdate/wrong_or_no_fields_put_update_response_schema.json"))
             .expectBody("username", notNullValue())
             .expectBody("firstName", notNullValue())
             .expectBody("lastName", notNullValue())
@@ -99,7 +99,7 @@ public class UpdateUserSpec {
             .log(ALL)
             .expectStatusCode(200)
             .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/putUpdate/no_fields_patch_update_response_schema.json"))
+                    "schemas/putUpdate/successful_one_field_patch_update_response_schema.json"))
             .expectBody("username", notNullValue())
             .expectBody("firstName", notNullValue())
             .expectBody("lastName", notNullValue())

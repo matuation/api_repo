@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static specs.login.LoginSpec.loginRequestSpec;
+import static specs.login.LoginSpec.requestSpec;
 import static specs.login.LoginSpec.successfulLoginResponseSpec;
 import static specs.logout.LogOutSpec.*;
 
@@ -24,7 +24,7 @@ public class LogoutTests extends TestBase {
     public void successfulLogoutTest() {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        String refreshToken = given(loginRequestSpec)
+        String refreshToken = given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
@@ -34,7 +34,7 @@ public class LogoutTests extends TestBase {
 
         LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
 
-        SuccessfulLogoutResponseModel successfulLogout = given(loginRequestSpec)
+        SuccessfulLogoutResponseModel successfulLogout = given(requestSpec)
                 .body(logoutBody)
                 .when()
                 .post("/auth/logout/")
@@ -51,7 +51,7 @@ public class LogoutTests extends TestBase {
 
         LogoutBodyModel logoutBody = new LogoutBodyModel(badToken);
 
-        InvalidLogoutTokenModel invalidToken = given(loginRequestSpec)
+        InvalidLogoutTokenModel invalidToken = given(requestSpec)
                 .body(logoutBody)
                 .when()
                 .post("/auth/logout/")
@@ -73,7 +73,7 @@ public class LogoutTests extends TestBase {
     public void emptyTokenLogoutTest() {
         LogoutBodyModel logoutBody = new LogoutBodyModel(emptyToken);
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(loginRequestSpec)
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
                 .body(logoutBody)
                 .when()
                 .post("/auth/logout/")
@@ -94,7 +94,7 @@ public class LogoutTests extends TestBase {
     public void nullTokenLogoutTest() {
         LogoutBodyModel logoutBody = new LogoutBodyModel(nullToken);
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(loginRequestSpec)
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
                 .body(logoutBody)
                 .when()
                 .post("/auth/logout/")
@@ -114,7 +114,7 @@ public class LogoutTests extends TestBase {
     public void noTokenLogoutTest() {
         NoTokenLogoutBodyModel logoutBody = new NoTokenLogoutBodyModel();
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(loginRequestSpec)
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
                 .body(logoutBody)
                 .when()
                 .post("/auth/logout/")
