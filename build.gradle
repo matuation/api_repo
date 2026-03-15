@@ -1,25 +1,44 @@
 plugins {
     id 'java-library'
+    id 'io.qameta.allure' version '2.12.0'
     id 'io.freefair.lombok' version "9.2.0"
+
 }
 
 repositories {
     mavenCentral()
 }
 
+def restAssuredVersion = "5.5.0",
+    allureVersion = "2.12.0",
+    junitVersion = "5.14.3",
+    slf4jVersion = "2.0.17"
+
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter { // отвечает за появление папочки build/allure-results
+        aspectjweaver = true //обработка аннотации @Step
+        frameworks {
+            junit5 { //название фреймворка
+                adapterVersion.set(allureVersion) //версия интеграции фреймворка и Allure
+            }
+        }
+    }
+}
+
 dependencies {
     testImplementation(
-            "io.rest-assured:rest-assured:6.0.0",
-            "io.rest-assured:json-schema-validator:6.0.0",
-            "tools.jackson.core:jackson-databind:3.1.0",
+            "io.rest-assured:rest-assured:$restAssuredVersion",
+            "io.rest-assured:json-schema-validator:$restAssuredVersion",
+            "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "com.fasterxml.jackson.core:jackson-databind:2.18.2",
             "net.datafaker:datafaker:2.5.4",
             "org.assertj:assertj-core:3.27.7",
-            "org.junit.jupiter:junit-jupiter-api:5.10.0"
+            "org.junit.jupiter:junit-jupiter:$junitVersion",
+            "org.slf4j:slf4j-simple:$slf4jVersion"
     )
-    testRuntimeOnly( 'org.junit.platform:junit-platform-launcher',
-            'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-    )
-
 }
 
 tasks.withType(Test) {

@@ -5,6 +5,7 @@ import models.logout.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.login.LoginSpec.requestSpec;
@@ -24,31 +25,32 @@ public class LogoutTests extends TestBase {
     public void successfulLogoutTest() {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        String refreshToken = given(requestSpec)
-                .body(loginData)
-                .when()
-                .post("/auth/token/")
-                .then()
-                .spec(successfulLoginResponseSpec)
-                .extract().path("refresh");
+        String refreshToken = step("Авторизация и получение токена", () ->
+                given(requestSpec)
+                        .body(loginData)
+                        .when()
+                        .post("/auth/token/")
+                        .then()
+                        .spec(successfulLoginResponseSpec)
+                        .extract().path("refresh"));
 
         LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
 
-        SuccessfulLogoutResponseModel successfulLogout = given(requestSpec)
-                .body(logoutBody)
-                .when()
-                .post("/auth/logout/")
-                .then()
-                .spec(successfulLogoutResponseSpec)
-                .extract().as(SuccessfulLogoutResponseModel.class);
-
-
+        step("Отправка запроса на разлогин с refershToken", () -> {
+            SuccessfulLogoutResponseModel successfulLogout = given(requestSpec)
+                    .body(logoutBody)
+                    .when()
+                    .post("/auth/logout/")
+                    .then()
+                    .spec(successfulLogoutResponseSpec)
+                    .extract().as(SuccessfulLogoutResponseModel.class);
+                    });
     }
 
     @Test
     @DisplayName("Передан невалидный токен")
     public void invalidTokenLogoutTest() {
-
+        step("Отправка запроса на разлогин с неправильным refershToken", () -> {
         LogoutBodyModel logoutBody = new LogoutBodyModel(badToken);
 
         InvalidLogoutTokenModel invalidToken = given(requestSpec)
@@ -66,11 +68,14 @@ public class LogoutTests extends TestBase {
         assertThat(actualDetailError).isEqualTo(expectedDetailError);
         assertThat(actualCodeError).isEqualTo(expectedCodeError);
 
+        });
     }
 
     @Test
     @DisplayName("Передан пустой токен")
     public void emptyTokenLogoutTest() {
+
+        step("Отправка запроса на разлогин с пустым refershToken", () -> {
         LogoutBodyModel logoutBody = new LogoutBodyModel(emptyToken);
 
         EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
@@ -85,13 +90,13 @@ public class LogoutTests extends TestBase {
         String actualRefreshError = emptyOrNullToken.refresh().get(0);
 
         assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
-
-
+        });
     }
 
     @Test
     @DisplayName("Передан null токен")
     public void nullTokenLogoutTest() {
+        step("Отправка запроса на разлогин с null refershToken", () -> {
         LogoutBodyModel logoutBody = new LogoutBodyModel(nullToken);
 
         EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
@@ -106,12 +111,14 @@ public class LogoutTests extends TestBase {
         String actualRefreshError = emptyOrNullToken.refresh().get(0);
 
         assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
-
+        });
     }
+
 
     @Test
     @DisplayName("Не передан токен")
     public void noTokenLogoutTest() {
+        step("Отправка запроса на разлогин с без refershToken", () -> {
         NoTokenLogoutBodyModel logoutBody = new NoTokenLogoutBodyModel();
 
         EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
@@ -126,6 +133,6 @@ public class LogoutTests extends TestBase {
         String actualRefreshError = emptyOrNullToken.refresh().get(0);
 
         assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
-
+        });
     }
 }

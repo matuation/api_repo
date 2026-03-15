@@ -1,5 +1,6 @@
 package tests;
 
+import io.restassured.path.json.JsonPath;
 import models.login.LoginBodyModel;
 import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.login.LoginSpec.requestSpec;
@@ -33,7 +37,7 @@ public class UpdateUserTests extends TestBase {
     String emptyFirstName = "";
     String emptyLastName = "";
     String emptyEmail = "";
-    String syntaxer = "\"";
+
 
 
     @BeforeEach
@@ -55,49 +59,52 @@ public class UpdateUserTests extends TestBase {
     @Test
     @DisplayName("Успешная замена данных методом PUT")
     public void successfulUpdatePutTest() {
+
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () ->
+                given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () ->
+                given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(username, firstName, lastName, email);
 
-        SuccessfulPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(successfulPutUserUpdateSpec)
-                .extract().as(SuccessfulPutUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        int actualId = putUpdateResponse.id();
-        String actualUsername = putUpdateResponse.username();
-        String actualFirstName = putUpdateResponse.firstName();
-        String actualLastName = putUpdateResponse.lastName();
-        String actualEmail = putUpdateResponse.email();
-        String actualAddr = putUpdateResponse.remoteAddr();
+        int actualId = putUpdateResponse.getInt("id");
+        String actualUsername = putUpdateResponse.getString("username");
+        String actualFirstName = putUpdateResponse.getString("firstName");
+        String actualLastName = putUpdateResponse.getString("lastName");
+        String actualEmail = putUpdateResponse.getString("email");
+        String actualAddr = putUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -113,44 +120,46 @@ public class UpdateUserTests extends TestBase {
     public void wrongExceedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () ->
+                given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                        .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () ->
+                given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                        .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(forbiddenUsername, exceededLengthUsername,
                 exceededLengthUsername, forbiddenExceededEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(wrongOrNoFieldsPutUserUpdateSpec)
-                .extract().as(WrongOrNoFieldsPutUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        String actualUsernameError = putUpdateResponse.username().get(0);
-        String actualFirstNameError = putUpdateResponse.firstName().get(0);
-        String actualLastNameError = putUpdateResponse.lastName().get(0);
-        String actualAmountEmailError = putUpdateResponse.email().get(0);
-        String actualFormatEmailError = putUpdateResponse.email().get(1);
+        String actualUsernameError = putUpdateResponse.getList("username", String.class).get(0);
+        String actualFirstNameError = putUpdateResponse.getList("firstName", String.class).get(0);
+        String actualLastNameError = putUpdateResponse.getList("lastName",String.class).get(0);
+        String actualAmountEmailError = putUpdateResponse.getList("email", String.class).get(0);
+        String actualFormatEmailError = putUpdateResponse.getList("email", String.class).get(1);
         String expectedUsernameError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
         String expectedFirstNameError = "Ensure this field has no more than 150 characters.";
         String expectedLastNameError = "Ensure this field has no more than 150 characters.";
@@ -170,43 +179,45 @@ public class UpdateUserTests extends TestBase {
     public void wrongEmailFormatUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () ->
+                given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () ->
+                given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                        .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(forbiddenUsername, exceededLengthUsername,
                 exceededLengthUsername, forbiddenEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(wrongOrNoFieldsPutUserUpdateSpec)
-                .extract().as(WrongOrNoFieldsPutUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        String actualUsernameError = putUpdateResponse.username().get(0);
-        String actualFirstNameError = putUpdateResponse.firstName().get(0);
-        String actualLastNameError = putUpdateResponse.lastName().get(0);
-        String actualFormatEmailError = putUpdateResponse.email().get(0);
+        String actualUsernameError = putUpdateResponse.getList("username", String.class).get(0);
+        String actualFirstNameError = putUpdateResponse.getList("firstName", String.class).get(0);
+        String actualLastNameError = putUpdateResponse.getList("lastName",String.class).get(0);
+        String actualFormatEmailError = putUpdateResponse.getList("email", String.class).get(0);
         String expectedUsernameError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
         String expectedFirstNameError = "Ensure this field has no more than 150 characters.";
         String expectedLastNameError = "Ensure this field has no more than 150 characters.";
@@ -224,42 +235,42 @@ public class UpdateUserTests extends TestBase {
     public void noFieldsProvidedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () ->
+                given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                        .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         EmptyPutUpdateBodyModel putUpdateBody = new EmptyPutUpdateBodyModel();
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(wrongOrNoFieldsPutUserUpdateSpec)
-                .extract().as(WrongOrNoFieldsPutUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        String actualUsernameError = putUpdateResponse.username().get(0);
-        String actualFirstNameError = putUpdateResponse.firstName().get(0);
-        String actualLastNameError = putUpdateResponse.lastName().get(0);
-        String actualFormatEmailError = putUpdateResponse.email().get(0);
+        String actualUsernameError = putUpdateResponse.getList("username", String.class).get(0);
+        String actualFirstNameError = putUpdateResponse.getList("firstName", String.class).get(0);
+        String actualLastNameError = putUpdateResponse.getList("lastName",String.class).get(0);
+        String actualFormatEmailError = putUpdateResponse.getList("email", String.class).get(0);
         String expectedUsernameError = "This field is required.";
         String expectedFirstNameError = "This field is required.";
         String expectedLastNameError = "This field is required.";
@@ -277,40 +288,39 @@ public class UpdateUserTests extends TestBase {
     public void emptyFieldsProvidedUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(emptyUsername, emptyFirstName,
                 emptyLastName, emptyEmail);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(emptyFieldsPutUserUpdateSpec)
-                .extract().as(WrongOrNoFieldsPutUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        String actualUsernameError = putUpdateResponse.username().get(0);
+        String actualUsernameError = putUpdateResponse.getList("username", String.class).get(0);
 
         String expectedUsernameError = "This field may not be blank.";
 
@@ -324,41 +334,41 @@ public class UpdateUserTests extends TestBase {
     public void onlyUsernameUpdatePutTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () ->
+                given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                        .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         OnlyUsernamePutUpdateBodyModel putUpdateBody = new OnlyUsernamePutUpdateBodyModel(username);
 
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = given(requestSpec)
+        JsonPath putUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .put("/users/me/")
                 .then()
                 .spec(onlyUsernamePutUserUpdateSpec)
-                .extract().as(WrongOrNoFieldsPutUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        String actualFirstNameError = putUpdateResponse.firstName().get(0);
-        String actualLastNameError = putUpdateResponse.lastName().get(0);
-        String actualFormatEmailError = putUpdateResponse.email().get(0);
+        String actualFirstNameError = putUpdateResponse.getList("firstName", String.class).get(0);
+        String actualLastNameError = putUpdateResponse.getList("lastName",String.class).get(0);
+        String actualFormatEmailError = putUpdateResponse.getList("email", String.class).get(0);
         String expectedFirstNameError = "This field is required.";
         String expectedLastNameError = "This field is required.";
         String expectedFormatEmailError = "This field is required.";
@@ -374,47 +384,47 @@ public class UpdateUserTests extends TestBase {
     public void successfulAllFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(username, firstName, lastName, email);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(successfulPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -430,47 +440,47 @@ public class UpdateUserTests extends TestBase {
     public void onlyUsernameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         OnlyUsernamePatchUpdateBodyModel patchUpdateBody = new OnlyUsernamePatchUpdateBodyModel(username);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(successfulOneFieldPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -486,47 +496,46 @@ public class UpdateUserTests extends TestBase {
     public void onlyFirstNameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         OnlyFirstNamePatchUpdateBodyModel patchUpdateBody = new OnlyFirstNamePatchUpdateBodyModel(firstName);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(successfulOneFieldPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -542,47 +551,46 @@ public class UpdateUserTests extends TestBase {
     public void onlyLastNameUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         OnlyLastNamePatchUpdateBodyModel patchUpdateBody = new OnlyLastNamePatchUpdateBodyModel(lastName);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(successfulOneFieldPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -599,47 +607,46 @@ public class UpdateUserTests extends TestBase {
     public void onlyEmailUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         OnlyEmailPatchUpdateBodyModel patchUpdateBody = new OnlyEmailPatchUpdateBodyModel(email);
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(successfulOneFieldPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
@@ -655,44 +662,44 @@ public class UpdateUserTests extends TestBase {
     public void exceedAndWrongFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(forbiddenExceededUsername, forbiddenExceededUsername, forbiddenExceededUsername, forbiddenExceededEmail);
 
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(wrongFieldsPatchUserUpdateSpec)
-                .extract().as(WrongFieldsPatchUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        String actualLengthUsernameError = patchUpdateResponse.username().get(0);
-        String actualFormatUsernameError = patchUpdateResponse.username().get(1);
-        String actualFirstNameError = patchUpdateResponse.firstName().get(0);
-        String actualLastNameError = patchUpdateResponse.lastName().get(0);
-        String actualAmountEmailError = patchUpdateResponse.email().get(0);
-        String actualFormatEmailError = patchUpdateResponse.email().get(1);
+        String actualLengthUsernameError = patchUpdateResponse.getList("username", String.class).get(0);
+        String actualFormatUsernameError = patchUpdateResponse.getList("username", String.class).get(1);
+        String actualFirstNameError = patchUpdateResponse.getList("firstName", String.class).get(0);
+        String actualLastNameError = patchUpdateResponse.getList("lastName",String.class).get(0);
+        String actualAmountEmailError = patchUpdateResponse.getList("email", String.class).get(0);
+        String actualFormatEmailError = patchUpdateResponse.getList("email", String.class).get(1);
         String expectedLengthUsernameError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
         String expectedUsernameError = "Ensure this field has no more than 150 characters.";
         String expectedFirstNameError = "Ensure this field has no more than 150 characters.";
@@ -714,39 +721,39 @@ public class UpdateUserTests extends TestBase {
     public void emptyFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(emptyUsername, emptyFirstName, emptyLastName, emptyEmail);
 
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () ->
+                given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(emptyFieldsPatchUserUpdateSpec)
-                .extract().as(WrongFieldsPatchUpdateResponseModel.class);
+                        .extract().jsonPath());
 
-        String actualUsernameError = patchUpdateResponse.username().get(0);
+        String actualUsernameError = patchUpdateResponse.getList("username", String.class).get(0);
         String expectedUsernameError = "This field may not be blank.";
 
         assertThat(actualUsernameError).isEqualTo(expectedUsernameError);
@@ -759,47 +766,46 @@ public class UpdateUserTests extends TestBase {
     public void wrongNoFieldsUpdatePatchTest() {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(requestSpec)
+        JsonPath registrationResponse = step("Регистрация пользователя", () -> given(requestSpec)
                 .body(registrationData)
                 .when()
                 .post("/users/register/")
                 .then()
                 .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+                .extract().jsonPath());
 
-        int userId = registrationResponse.id();
-        String remoteAddress = registrationResponse.remoteAddr();
+        int userId = registrationResponse.getInt("id");
+        String remoteAddress = registrationResponse.getString("remoteAddr");
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        SuccessfulLoginResponseModel loginResponse = given(requestSpec)
+        JsonPath loginResponse = step("Авторизация пользователя", () -> given(requestSpec)
                 .body(loginData)
                 .when()
                 .post("/auth/token/")
                 .then()
                 .spec(successfulLoginResponseSpec)
-                .extract().as(SuccessfulLoginResponseModel.class);
+                .extract().jsonPath());
 
-        String accessToken = "Bearer " + loginResponse.access();
+        String accessToken = "Bearer " + loginResponse.getString("access");
 
         EmptyPatchUpdateBodyModel patchUpdateBody = new EmptyPatchUpdateBodyModel();
 
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = given(requestSpec)
+        JsonPath patchUpdateResponse = step("Изменение данных пользователя", () -> given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
                 .when()
                 .patch("/users/me/")
                 .then()
                 .spec(noFieldsPatchUserUpdateSpec)
-                .extract().as(SuccessfulPatchUpdateResponseModel.class);
+                .extract().jsonPath());
 
-        int actualId = patchUpdateResponse.id();
-        String actualUsername = patchUpdateResponse.username();
-        String actualFirstName = patchUpdateResponse.firstName();
-        String actualLastName = patchUpdateResponse.lastName();
-        String actualEmail = patchUpdateResponse.email();
-        String actualAddr = patchUpdateResponse.remoteAddr();
+        int actualId = patchUpdateResponse.getInt("id");
+        String actualUsername = patchUpdateResponse.getString("username");
+        String actualFirstName = patchUpdateResponse.getString("firstName");
+        String actualLastName = patchUpdateResponse.getString("lastName");
+        String actualEmail = patchUpdateResponse.getString("email");
+        String actualAddr = patchUpdateResponse.getString("remoteAddr");
 
         assertThat(actualId).isEqualTo(userId);
         assertThat(actualUsername).isEqualTo(username);
