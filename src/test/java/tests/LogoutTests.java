@@ -23,20 +23,20 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Успешный выход")
     public void successfulLogoutTest() {
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        String refreshToken = step("Авторизация и получение токена", () ->
-                given(requestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract().path("refresh"));
-
-        LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
+        String refreshToken = step("Авторизация и получение токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(requestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract().path("refresh");
+        });
 
         step("Отправка запроса на разлогин с refershToken", () -> {
+            LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
             SuccessfulLogoutResponseModel successfulLogout = given(requestSpec)
                     .body(logoutBody)
                     .when()
@@ -44,30 +44,27 @@ public class LogoutTests extends TestBase {
                     .then()
                     .spec(successfulLogoutResponseSpec)
                     .extract().as(SuccessfulLogoutResponseModel.class);
-                    });
+        });
     }
 
     @Test
     @DisplayName("Передан невалидный токен")
     public void invalidTokenLogoutTest() {
-        step("Отправка запроса на разлогин с неправильным refershToken", () -> {
-        LogoutBodyModel logoutBody = new LogoutBodyModel(badToken);
 
-        InvalidLogoutTokenModel invalidToken = given(requestSpec)
-                .body(logoutBody)
-                .when()
-                .post("/auth/logout/")
-                .then()
-                .spec(invalidLogoutResponseSpec)
-                .extract().as(InvalidLogoutTokenModel.class);
+        InvalidLogoutTokenModel invalidToken = step("Отправка запроса на разлогин с неправильным refershToken", () -> {
+            LogoutBodyModel logoutBody = new LogoutBodyModel(badToken);
+            return given(requestSpec)
+                    .body(logoutBody)
+                    .when()
+                    .post("/auth/logout/")
+                    .then()
+                    .spec(invalidLogoutResponseSpec)
+                    .extract().as(InvalidLogoutTokenModel.class);
+        });
 
-        String expectedDetailError = "Token is invalid";
-        String expectedCodeError = "token_not_valid";
-        String actualDetailError = invalidToken.detail();
-        String actualCodeError = invalidToken.code();
-        assertThat(actualDetailError).isEqualTo(expectedDetailError);
-        assertThat(actualCodeError).isEqualTo(expectedCodeError);
-
+        step("Проверка корректности сообщения об ошибке", () -> {
+            assertThat(invalidToken.detail()).isEqualTo("Token is invalid");
+            assertThat(invalidToken.code()).isEqualTo("token_not_valid");
         });
     }
 
@@ -75,64 +72,62 @@ public class LogoutTests extends TestBase {
     @DisplayName("Передан пустой токен")
     public void emptyTokenLogoutTest() {
 
-        step("Отправка запроса на разлогин с пустым refershToken", () -> {
-        LogoutBodyModel logoutBody = new LogoutBodyModel(emptyToken);
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = step("Отправка запроса на разлогин с пустым refershToken", () -> {
+            LogoutBodyModel logoutBody = new LogoutBodyModel(emptyToken);
+            return given(requestSpec)
+                    .body(logoutBody)
+                    .when()
+                    .post("/auth/logout/")
+                    .then()
+                    .spec(emptyOrNullLogoutResponseSpec)
+                    .extract().as(EmptyOrNullLogoutResponseModel.class);
+        });
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
-                .body(logoutBody)
-                .when()
-                .post("/auth/logout/")
-                .then()
-                .spec(emptyOrNullLogoutResponseSpec)
-                .extract().as(EmptyOrNullLogoutResponseModel.class);
+        step("Проверка корректности сообщения об ошибке", () -> {
 
-        String expectedRefreshError = "This field may not be blank.";
-        String actualRefreshError = emptyOrNullToken.refresh().get(0);
-
-        assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
+            assertThat(emptyOrNullToken.refresh().get(0)).isEqualTo("This field may not be blank.");
         });
     }
 
     @Test
     @DisplayName("Передан null токен")
     public void nullTokenLogoutTest() {
-        step("Отправка запроса на разлогин с null refershToken", () -> {
-        LogoutBodyModel logoutBody = new LogoutBodyModel(nullToken);
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
-                .body(logoutBody)
-                .when()
-                .post("/auth/logout/")
-                .then()
-                .spec(emptyOrNullLogoutResponseSpec)
-                .extract().as(EmptyOrNullLogoutResponseModel.class);
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = step("Отправка запроса на разлогин с null refershToken", () -> {
+            LogoutBodyModel logoutBody = new LogoutBodyModel(nullToken);
+            return given(requestSpec)
+                    .body(logoutBody)
+                    .when()
+                    .post("/auth/logout/")
+                    .then()
+                    .spec(emptyOrNullLogoutResponseSpec)
+                    .extract().as(EmptyOrNullLogoutResponseModel.class);
+        });
 
-        String expectedRefreshError = "This field may not be null.";
-        String actualRefreshError = emptyOrNullToken.refresh().get(0);
+        step("Проверка корректности сообщения об ошибке", () -> {
 
-        assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
+            assertThat(emptyOrNullToken.refresh().get(0)).isEqualTo("This field may not be null.");
         });
     }
-
 
     @Test
     @DisplayName("Не передан токен")
     public void noTokenLogoutTest() {
-        step("Отправка запроса на разлогин с без refershToken", () -> {
-        NoTokenLogoutBodyModel logoutBody = new NoTokenLogoutBodyModel();
 
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = given(requestSpec)
-                .body(logoutBody)
-                .when()
-                .post("/auth/logout/")
-                .then()
-                .spec(emptyOrNullLogoutResponseSpec)
-                .extract().as(EmptyOrNullLogoutResponseModel.class);
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = step("Отправка запроса на разлогин с без refershToken", () -> {
+            NoTokenLogoutBodyModel logoutBody = new NoTokenLogoutBodyModel();
+            return given(requestSpec)
+                    .body(logoutBody)
+                    .when()
+                    .post("/auth/logout/")
+                    .then()
+                    .spec(emptyOrNullLogoutResponseSpec)
+                    .extract().as(EmptyOrNullLogoutResponseModel.class);
+        });
 
-        String expectedRefreshError = "This field is required.";
-        String actualRefreshError = emptyOrNullToken.refresh().get(0);
+        step("Проверка корректности сообщения об ошибке", () -> {
 
-        assertThat(actualRefreshError).isEqualTo(expectedRefreshError);
+            assertThat(emptyOrNullToken.refresh().get(0)).isEqualTo("This field is required.");
         });
     }
 }
