@@ -20,7 +20,7 @@ public class RegistrationTests extends TestBase {
     @BeforeEach
     public void prepareTestData() {
         GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
-        GENERATED_PASSWORD  = faker.name().firstName();
+        GENERATED_PASSWORD = faker.name().firstName();
         FORBIDDEN_USERNAME = faker.regexify("[\\=]{5}");
         EXCEEDED_USERNAME = faker.regexify("[\\w.@+-]{151}");
         EXCEEDED_PASSWORD = faker.regexify("[\\w.@+-]{129}");

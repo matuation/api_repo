@@ -1,16 +1,15 @@
 package tests;
 
 import models.login.LoginBodyModel;
-import models.logout.*;
+import models.logout.EmptyOrNullLogoutResponseModel;
+import models.logout.InvalidLogoutTokenModel;
+import models.logout.LogoutBodyModel;
+import models.logout.NoTokenLogoutBodyModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static specs.login.LoginSpec.requestSpec;
-import static specs.login.LoginSpec.successfulLoginResponseSpec;
-import static specs.logout.LogOutSpec.*;
 import static tests.TestData.*;
 
 public class LogoutTests extends TestBase {
@@ -21,8 +20,8 @@ public class LogoutTests extends TestBase {
         LoginBodyModel loginData = new LoginBodyModel(USERNAME, PASSWORD);
         String refreshToken = api.auth.loginRefreshToken(loginData);
 
-            LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
-            api.auth.logout(logoutBody);
+        LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
+        api.auth.logout(logoutBody);
     }
 
     @Test
