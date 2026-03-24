@@ -17,8 +17,8 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Успешный выход")
     public void successfulLogoutTest() {
-        LoginBodyModel loginData = new LoginBodyModel(USERNAME, PASSWORD);
-        String refreshToken = api.auth.loginRefreshToken(loginData);
+
+        String refreshToken = api.auth.loginRefreshToken(new LoginBodyModel(USERNAME, PASSWORD));
 
         LogoutBodyModel logoutBody = new LogoutBodyModel(refreshToken);
         api.auth.logout(logoutBody);
@@ -27,8 +27,8 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Передан невалидный токен")
     public void invalidTokenLogoutTest() {
-        LogoutBodyModel logoutBody = new LogoutBodyModel(BAD_TOKEN);
-        InvalidLogoutTokenModel invalidToken = api.auth.logoutTokenError(logoutBody);
+
+        InvalidLogoutTokenModel invalidToken = api.auth.logoutTokenError(new LogoutBodyModel(BAD_TOKEN));
 
         step("Проверка корректности сообщения об ошибке", () -> {
             assertThat(invalidToken.detail()).isEqualTo("Token is invalid");
@@ -39,8 +39,8 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Передан пустой токен")
     public void emptyTokenLogoutTest() {
-        LogoutBodyModel logoutBody = new LogoutBodyModel(EMPTY_STRING);
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutEmptyTokenError(logoutBody);
+
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutEmptyTokenError(new LogoutBodyModel(EMPTY_STRING));
         step("Проверка корректности сообщения об ошибке", () -> {
 
             assertThat(emptyOrNullToken.refresh().get(0)).isEqualTo(BLANK_FIELD_ERROR);
@@ -51,8 +51,7 @@ public class LogoutTests extends TestBase {
     @DisplayName("Передан null токен")
     public void nullTokenLogoutTest() {
 
-        LogoutBodyModel logoutBody = new LogoutBodyModel(NULL_STRING);
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutEmptyTokenError(logoutBody);
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutEmptyTokenError(new LogoutBodyModel(NULL_STRING));
 
         step("Проверка корректности сообщения об ошибке", () -> {
 
@@ -63,8 +62,8 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Не передан токен")
     public void noTokenLogoutTest() {
-        NoTokenLogoutBodyModel logoutBody = new NoTokenLogoutBodyModel();
-        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutNoTokenError(logoutBody);
+
+        EmptyOrNullLogoutResponseModel emptyOrNullToken = api.auth.logoutNoTokenError(new NoTokenLogoutBodyModel());
 
         step("Проверка корректности сообщения об ошибке", () -> {
 

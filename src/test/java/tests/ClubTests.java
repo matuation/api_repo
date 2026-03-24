@@ -28,7 +28,7 @@ public class ClubTests extends TestBase {
     @BeforeEach
     public void prepareTestData() {
         GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
-        GENERATED_PASSWORD = faker.name().firstName();
+        GENERATED_PASSWORD = faker.credentials().password();
         bookTitle = faker.book().title() + " " + faker.naruto().character() + " " + faker.battlefield1().weapon();
         newBookTitle = faker.book().title() + " " + faker.naruto().eye() + " " + faker.battlefield1().map();
         bookAuthors = faker.book().author();
@@ -43,11 +43,11 @@ public class ClubTests extends TestBase {
     @Test
     @DisplayName("Успешное создание клуба")
     public void successfulClubCreationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
         CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
                 publicationYear, description, TELEGRAM_LINK);
@@ -71,17 +71,18 @@ public class ClubTests extends TestBase {
     @Test
     @DisplayName("Успешный просмотр созданного клуба")
     public void successfulClubGetTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                publicationYear, description, TELEGRAM_LINK);
-        CreateClubPostResponseBodyModel createClubBodyModel = api.club.clubCreate(createClub, accessToken);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        GetClubResponseBodyModel getClubResponse = api.club.clubGet(Integer.parseInt(createClubBodyModel.id()), accessToken);
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
+
+        GetClubResponseBodyModel getClubResponse =
+                api.club.clubGet(Integer.parseInt(createClubBodyModel.id()), accessToken);
 
         step("Проверка значений полученного клуба", () -> {
             assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id());
@@ -101,19 +102,21 @@ public class ClubTests extends TestBase {
     @Test
     @DisplayName("Успешное обновление книжного клуба")
     public void successfulClubPutUpdateTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                publicationYear, description, TELEGRAM_LINK);
-        CreateClubPostResponseBodyModel createClubBodyModel = api.club.clubCreate(createClub, accessToken);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
 
         UpdateClubPutRequestBodyModel updateClub = new UpdateClubPutRequestBodyModel(newBookTitle, newBookAuthors,
                 newPublicationYear, newDescription, NEW_TELEGRAM_LINK);
-        UpdateClubPutResponseBodyModel updateClubBodyModel = api.club.clubPutUpdate(Integer.parseInt(createClubBodyModel.id()), updateClub, accessToken);
+        UpdateClubPutResponseBodyModel updateClubBodyModel =
+                api.club.clubPutUpdate(Integer.parseInt(createClubBodyModel.id()), updateClub, accessToken);
 
         step("Проверка значений полученного клуба", () -> {
             assertThat(updateClubBodyModel.id()).isEqualTo(createClubBodyModel.id());
@@ -133,18 +136,19 @@ public class ClubTests extends TestBase {
     @Test
     @DisplayName("Успешное удаление клуба")
     public void successfulClubDeleteTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                publicationYear, description, TELEGRAM_LINK);
-        CreateClubPostResponseBodyModel createClubBodyModel = api.club.clubCreate(createClub, accessToken);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
 
         api.club.clubDelete(Integer.parseInt(createClubBodyModel.id()), accessToken);
-        GetNotExistingClubResponseBodyModel getLostClub = api.club.getNotExistingClub(Integer.parseInt(createClubBodyModel.id()), accessToken);
+        GetNotExistingClubResponseBodyModel getLostClub =
+                api.club.getNotExistingClub(Integer.parseInt(createClubBodyModel.id()), accessToken);
 
         step("Проверка корректной ошибки", () -> {
             assertThat(getLostClub.detail()).isEqualTo(NO_CLUB_ERROR);

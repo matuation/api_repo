@@ -20,7 +20,7 @@ public class RegistrationTests extends TestBase {
     @BeforeEach
     public void prepareTestData() {
         GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
-        GENERATED_PASSWORD = faker.name().firstName();
+        GENERATED_PASSWORD = faker.credentials().password();
         FORBIDDEN_USERNAME = faker.regexify("[\\=]{5}");
         EXCEEDED_USERNAME = faker.regexify("[\\w.@+-]{151}");
         EXCEEDED_PASSWORD = faker.regexify("[\\w.@+-]{129}");
@@ -30,8 +30,8 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Успешная регистрация")
     public void successfulRegistrationTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel
+                (GENERATED_USERNAME, GENERATED_PASSWORD));
 
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
@@ -48,9 +48,10 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Регистрация существующего пользователя")
 
     public void existingUserWrongRegistrationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel firstRegistrationResponse = api.user.userRegistration(registrationData);
-        WrongUserResponseModel secondRegistrationResponse = api.user.incorrectUserRegistration(registrationData);
+
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+        WrongUserResponseModel secondRegistrationResponse = api.user.incorrectUserRegistration(new RegistrationBodyModel
+                (GENERATED_USERNAME, GENERATED_PASSWORD));
 
         step("Проверка корректности отображенных ошибок", () -> {
 
@@ -61,8 +62,9 @@ public class RegistrationTests extends TestBase {
     @Test
     @DisplayName("Регистрация пользователя c username содержащим недопустимый символ")
     public void forbiddenUsernameRegistrationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(FORBIDDEN_USERNAME, PASSWORD);
-        WrongUserResponseModel registrationResponse = api.user.incorrectUserRegistration(registrationData);
+
+        WrongUserResponseModel registrationResponse = api.user.incorrectUserRegistration
+                (new RegistrationBodyModel(FORBIDDEN_USERNAME, PASSWORD));
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(registrationResponse.username().get(0)).isEqualTo(INVALID_USERNAME_ERROR);
@@ -72,8 +74,10 @@ public class RegistrationTests extends TestBase {
     @Test
     @DisplayName("Регистрация пользователя c превышенной длинной полей")
     public void exceededUsernameAndPasswordRegistrationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(EXCEEDED_USERNAME, EXCEEDED_PASSWORD);
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = api.user.incorrectUserAndPasswordRegistration(registrationData);
+
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse =
+                api.user.incorrectUserAndPasswordRegistration(new RegistrationBodyModel
+                        (EXCEEDED_USERNAME, EXCEEDED_PASSWORD));
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(RegistrationResponse.username().get(0)).isEqualTo(EXCEEDED_USERNAME_ERROR);
@@ -84,8 +88,9 @@ public class RegistrationTests extends TestBase {
     @Test
     @DisplayName("Регистрация пользователя c пустыми полями")
     public void emptyUsernameAndPasswordRegistrationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(EMPTY_STRING, EMPTY_STRING);
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = api.user.incorrectUserAndPasswordRegistration(registrationData);
+
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse =
+                api.user.incorrectUserAndPasswordRegistration(new RegistrationBodyModel(EMPTY_STRING, EMPTY_STRING));
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(RegistrationResponse.username().get(0)).isEqualTo(BLANK_FIELD_ERROR);
@@ -96,8 +101,9 @@ public class RegistrationTests extends TestBase {
     @Test
     @DisplayName("Регистрация пользователя c null полями")
     public void nullUsernameAndPasswordRegistrationTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(NULL_STRING, NULL_STRING);
-        WrongUsernameAndPasswordRegistrationResponseModel registrationResponse = api.user.incorrectUserAndPasswordRegistration(registrationData);
+
+        WrongUsernameAndPasswordRegistrationResponseModel registrationResponse =
+                api.user.incorrectUserAndPasswordRegistration(new RegistrationBodyModel(NULL_STRING, NULL_STRING));
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(registrationResponse.username().get(0)).isEqualTo(NULL_FIELD_ERROR);
@@ -109,8 +115,8 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Регистрация пользователя без полей")
     public void noUsernameAndPasswordRegistrationTest() {
 
-        NoUsernameAndPasswordRegistrationRequestModel registrationData = new NoUsernameAndPasswordRegistrationRequestModel();
-        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse = api.user.noUserAndPasswordRegistration(registrationData);
+        WrongUsernameAndPasswordRegistrationResponseModel RegistrationResponse =
+                api.user.noUserAndPasswordRegistration(new NoUsernameAndPasswordRegistrationRequestModel());
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(RegistrationResponse.username().get(0)).isEqualTo(REQUIRED_FIELD_ERROR);

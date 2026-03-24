@@ -15,8 +15,7 @@ public class LoginTests extends TestBase {
     @DisplayName("Успешный логин")
     public void successfulLoginTest() {
 
-        LoginBodyModel loginData = new LoginBodyModel(USERNAME, PASSWORD);
-        SuccessfulLoginResponseModel loginResponse = api.auth.login(loginData);
+        SuccessfulLoginResponseModel loginResponse = api.auth.login(new LoginBodyModel(USERNAME, PASSWORD));
 
         step("Проверка корректности выданных токенов", () -> {
 
@@ -29,8 +28,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Неправильный пароль")
     public void wrongCredentialsLoginTest() {
-        LoginBodyModel loginData = new LoginBodyModel(USERNAME, WRONG_PASSWORD);
-        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(loginData);
+
+        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(new LoginBodyModel(USERNAME, WRONG_PASSWORD));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -41,8 +40,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Неправильный логин")
     public void wrongCredentialsPasswordTest() {
-        LoginBodyModel loginData = new LoginBodyModel(USERNAME, WRONG_PASSWORD);
-        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(loginData);
+
+        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(new LoginBodyModel(USERNAME, WRONG_PASSWORD));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -53,8 +52,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Неправильный логин и пароль")
     public void wrongCredentialsNameAndPasswordTest() {
-        LoginBodyModel loginData = new LoginBodyModel(WRONG_USERNAME, WRONG_PASSWORD);
-        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(loginData);
+
+        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongCredentials(new LoginBodyModel(WRONG_USERNAME, WRONG_PASSWORD));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -65,8 +64,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Логин с неверным форматом данных")
     public void wrongCredentialsWrongFormatTest() {
-        WrongDataFormatLoginBodyModel loginData = new WrongDataFormatLoginBodyModel(WRONG_FORMAT, WRONG_FORMAT);
-        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongFormatCredentials(loginData);
+
+        WrongCredentialsLoginResponseModel loginResponse = api.auth.wrongFormatCredentials(new WrongDataFormatLoginBodyModel(WRONG_FORMAT, WRONG_FORMAT));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -77,8 +76,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Логин с пустыми строками")
     public void wrongCredentialsEmptyStringTest() {
-        LoginBodyModel loginData = new LoginBodyModel(EMPTY_STRING, EMPTY_STRING);
-        EmptyCredentialsLoginResponseModel loginResponse = api.auth.emptyCredentials(loginData);
+
+        EmptyCredentialsLoginResponseModel loginResponse = api.auth.emptyCredentials(new LoginBodyModel(EMPTY_STRING, EMPTY_STRING));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -91,8 +90,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Логин с null параметрами")
     public void wrongCredentialsNullTest() {
-        LoginBodyModel loginData = new LoginBodyModel(NULL_STRING, NULL_STRING);
-        EmptyCredentialsLoginResponseModel loginResponse = api.auth.emptyCredentials(loginData);
+
+        EmptyCredentialsLoginResponseModel loginResponse = api.auth.emptyCredentials(new LoginBodyModel(NULL_STRING, NULL_STRING));
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 
@@ -104,8 +103,8 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Логин без параметров")
     public void noCredentialsNullTest() {
-        NoCredentialsLoginResponseModel loginData = new NoCredentialsLoginResponseModel();
-        EmptyCredentialsLoginResponseModel loginResponse = api.auth.noCredentials(loginData);
+
+        EmptyCredentialsLoginResponseModel loginResponse = api.auth.noCredentials(new NoCredentialsLoginResponseModel());
 
         step("Проверка отображения ожидаемой ошибки", () -> {
 

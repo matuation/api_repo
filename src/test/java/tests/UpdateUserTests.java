@@ -32,7 +32,7 @@ public class UpdateUserTests extends TestBase {
     public void prepareTestData() {
         GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
         NEW_GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
-        GENERATED_PASSWORD  = faker.name().firstName();
+        GENERATED_PASSWORD = faker.credentials().password();
         GENERATED_FIRST_NAME = faker.name().firstName();
         GENERATED_LAST_NAME = faker.name().lastName();
         GENERATED_EMAIL = faker.internet().emailAddress();
@@ -47,15 +47,17 @@ public class UpdateUserTests extends TestBase {
     @Test
     @DisplayName("Успешная замена данных методом PUT")
     public void successfulUpdatePutTest() {
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(NEW_GENERATED_USERNAME, GENERATED_FIRST_NAME,
-                GENERATED_LAST_NAME, GENERATED_EMAIL);
-        SuccessfulPutUpdateResponseModel putUpdateResponse = api.user.successfulUpdatePut(putUpdateBody, accessToken);
+
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
+
+        SuccessfulPutUpdateResponseModel putUpdateResponse =
+                api.user.successfulUpdatePut(new PutUpdateBodyModel(NEW_GENERATED_USERNAME, GENERATED_FIRST_NAME,
+                        GENERATED_LAST_NAME, GENERATED_EMAIL), accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(putUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -71,15 +73,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена данных методом PUT - превышен лимит и некорректный Username")
     public void wrongExceedUpdatePutTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(FORBIDDEN_USERNAME, EXCEEDED_USERNAME,
-                EXCEEDED_USERNAME, FORBIDDEN_EXCEED_EMAIL);
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = api.user.unsuccessfulUpdatePut(putUpdateBody, accessToken);
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse =
+                api.user.unsuccessfulUpdatePut(new PutUpdateBodyModel(FORBIDDEN_USERNAME, EXCEEDED_USERNAME,
+                        EXCEEDED_USERNAME, FORBIDDEN_EXCEED_EMAIL), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(putUpdateResponse.username().get(0)).isEqualTo(INVALID_USERNAME_ERROR);
@@ -94,16 +95,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена данных методом PUT - превышен лимит и некорректный Email")
     public void wrongEmailFormatUpdatePutTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(FORBIDDEN_USERNAME, EXCEEDED_USERNAME,
-                EXCEEDED_USERNAME, FORBIDDEN_EMAIL);
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = api.user.unsuccessfulUpdatePut(putUpdateBody, accessToken);
-
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse =
+                api.user.unsuccessfulUpdatePut(new PutUpdateBodyModel(FORBIDDEN_USERNAME, EXCEEDED_USERNAME,
+                        EXCEEDED_USERNAME, FORBIDDEN_EMAIL), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(putUpdateResponse.username().get(0)).isEqualTo(INVALID_USERNAME_ERROR);
@@ -117,14 +116,13 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена данных методом PUT - поля не переданы в тело")
     public void noFieldsProvidedUpdatePutTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        EmptyPutUpdateBodyModel putUpdateBody = new EmptyPutUpdateBodyModel();
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = api.user.noDataUpdatePut(putUpdateBody, accessToken);
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse =
+                api.user.noDataUpdatePut(new EmptyPutUpdateBodyModel(), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(putUpdateResponse.username().get(0)).isEqualTo(REQUIRED_FIELD_ERROR);
@@ -138,15 +136,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена данных методом PUT - пустые поля")
     public void emptyFieldsProvidedUpdatePutTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        PutUpdateBodyModel putUpdateBody = new PutUpdateBodyModel(EMPTY_STRING, EMPTY_STRING,
-                EMPTY_STRING, EMPTY_STRING);
-        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse = api.user.emptyUpdatePut(putUpdateBody, accessToken);
+        WrongOrNoFieldsPutUpdateResponseModel putUpdateResponse =
+                api.user.emptyUpdatePut(new PutUpdateBodyModel(EMPTY_STRING, EMPTY_STRING,
+                        EMPTY_STRING, EMPTY_STRING), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(putUpdateResponse.username().get(0)).isEqualTo(BLANK_FIELD_ERROR);
@@ -157,14 +154,13 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена данных методом PUT - передан только Username")
     public void onlyUsernameUpdatePutTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        OnlyUsernamePutUpdateBodyModel putUpdateBody = new OnlyUsernamePutUpdateBodyModel(GENERATED_USERNAME);
-        OnlyUsernamePutUpdateResponseModel putUpdateResponse = api.user.onlyUsernameUpdatePut(putUpdateBody, accessToken);
+        OnlyUsernamePutUpdateResponseModel putUpdateResponse =
+                api.user.onlyUsernameUpdatePut(new OnlyUsernamePutUpdateBodyModel(GENERATED_USERNAME), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(putUpdateResponse.firstName().get(0)).isEqualTo(REQUIRED_FIELD_ERROR);
@@ -177,15 +173,15 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Успешная замена всех данных методом PATCH")
     public void successfulAllFieldsUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(NEW_GENERATED_USERNAME, GENERATED_FIRST_NAME,
-                GENERATED_LAST_NAME, GENERATED_EMAIL);
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.successfulUpdatePatch(patchUpdateBody,accessToken);
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.successfulUpdatePatch(new PatchUpdateBodyModel(NEW_GENERATED_USERNAME, GENERATED_FIRST_NAME,
+                        GENERATED_LAST_NAME, GENERATED_EMAIL), accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -201,14 +197,16 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Успешная замена только Username методом PATCH")
     public void onlyUsernameUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        OnlyUsernamePatchUpdateBodyModel patchUpdateBody = new OnlyUsernamePatchUpdateBodyModel(NEW_GENERATED_USERNAME);
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.successfulUsernameUpdatePatch(patchUpdateBody,accessToken);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
+
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.successfulUsernameUpdatePatch(new OnlyUsernamePatchUpdateBodyModel(NEW_GENERATED_USERNAME),
+                        accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -224,14 +222,15 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Успешная замена только FirstName методом PATCH")
     public void onlyFirstNameUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        OnlyFirstNamePatchUpdateBodyModel patchUpdateBody = new OnlyFirstNamePatchUpdateBodyModel(GENERATED_FIRST_NAME);
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.successfulFirstNameUpdatePatch(patchUpdateBody,accessToken);
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.successfulFirstNameUpdatePatch(new OnlyFirstNamePatchUpdateBodyModel(GENERATED_FIRST_NAME),
+                        accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -247,14 +246,15 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Успешная замена только LastName методом PATCH")
     public void onlyLastNameUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        OnlyLastNamePatchUpdateBodyModel patchUpdateBody = new OnlyLastNamePatchUpdateBodyModel(GENERATED_LAST_NAME);
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.successfulLastNameUpdatePatch(patchUpdateBody,accessToken);
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.successfulLastNameUpdatePatch(new OnlyLastNamePatchUpdateBodyModel(GENERATED_LAST_NAME),
+                        accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -271,14 +271,15 @@ public class UpdateUserTests extends TestBase {
     public void onlyEmailUpdatePatchTest() {
 
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        OnlyEmailPatchUpdateBodyModel patchUpdateBody = new OnlyEmailPatchUpdateBodyModel(GENERATED_EMAIL);
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.successfulEmailNameUpdatePatch(patchUpdateBody,accessToken);
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.successfulEmailNameUpdatePatch(new OnlyEmailPatchUpdateBodyModel(GENERATED_EMAIL),
+                        accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
@@ -294,15 +295,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена всех полей методом PATCH - превышен лимит символов, нарушен формат")
     public void exceedAndWrongFieldsUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(FORBIDDEN_EXCEED_USERNAME, FORBIDDEN_EXCEED_USERNAME,
-                FORBIDDEN_EXCEED_USERNAME, FORBIDDEN_EXCEED_EMAIL);
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = api.user.unsuccessfulUpdatePatch(patchUpdateBody,accessToken);
+        WrongFieldsPatchUpdateResponseModel patchUpdateResponse =
+                api.user.unsuccessfulUpdatePatch(new PatchUpdateBodyModel(FORBIDDEN_EXCEED_USERNAME,
+                        FORBIDDEN_EXCEED_USERNAME, FORBIDDEN_EXCEED_USERNAME, FORBIDDEN_EXCEED_EMAIL), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(patchUpdateResponse.username().get(0)).isEqualTo(INVALID_USERNAME_ERROR);
@@ -318,14 +318,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена всех полей методом PATCH - переданы пустые строки")
     public void emptyFieldsUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        PatchUpdateBodyModel patchUpdateBody = new PatchUpdateBodyModel(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-        WrongFieldsPatchUpdateResponseModel patchUpdateResponse = api.user.unsuccessfulUpdatePatch(patchUpdateBody,accessToken);
+        WrongFieldsPatchUpdateResponseModel patchUpdateResponse =
+                api.user.unsuccessfulUpdatePatch(new PatchUpdateBodyModel(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING,
+                        EMPTY_STRING), accessToken);
 
         step("Проверка корректности отображенных ошибок", () -> {
             assertThat(patchUpdateResponse.username().get(0)).isEqualTo(BLANK_FIELD_ERROR);
@@ -336,14 +336,14 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Неуспешная замена всех полей методом PATCH - не переданы поля")
     public void wrongNoFieldsUpdatePatchTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(registrationData);
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-        LoginBodyModel loginData = new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD);
-        String accessToken = "Bearer " + api.auth.loginAccessToken(loginData);
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME,
+                GENERATED_PASSWORD));
 
-        EmptyPatchUpdateBodyModel patchUpdateBody = new EmptyPatchUpdateBodyModel();
-        SuccessfulPatchUpdateResponseModel patchUpdateResponse = api.user.unsuccessfulNoFieldsUpdatePatch(patchUpdateBody,accessToken);
+        SuccessfulPatchUpdateResponseModel patchUpdateResponse =
+                api.user.unsuccessfulNoFieldsUpdatePatch(new EmptyPatchUpdateBodyModel(), accessToken);
 
         step("Проверка корректности обновления данных", () -> {
             assertThat(patchUpdateResponse.id()).isEqualTo(registrationResponse.id());
