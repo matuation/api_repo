@@ -3,6 +3,7 @@ package specs.club;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 
+import static io.restassured.RestAssured.with;
 import static io.restassured.filter.log.LogDetail.ALL;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.*;
@@ -72,6 +73,19 @@ public class ClubSpec {
             .expectStatusCode(404)
             .expectBody(matchesJsonSchemaInClasspath(
                     "schemas/club/not_exisiting_club_response_schema.json"))
+            .expectBody("detail", notNullValue())
+            .build();
+
+    public static ResponseSpecification successfulClubSignup = with()
+            .log()
+            .all()
+            .expect().statusCode(204);
+
+    public static ResponseSpecification unsuccessfulClubSignupAlreadySigned = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(400)
+    .expectBody(matchesJsonSchemaInClasspath(
+            "schemas/club/not_exisiting_club_response_schema.json"))
             .expectBody("detail", notNullValue())
             .build();
 }

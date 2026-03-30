@@ -2,6 +2,7 @@ package api;
 
 import io.qameta.allure.Step;
 import models.club.*;
+import models.review.ReviewPostResponseBodyModel;
 
 import static io.restassured.RestAssured.given;
 import static specs.club.ClubSpec.*;
@@ -62,5 +63,26 @@ public class ClubApiClient {
                 .then()
                 .spec(notExistingClubGetSpec)
                 .extract().as(GetNotExistingClubResponseBodyModel.class);
+    }
+
+    @Step("Вступление в клуб")
+    public void signupToClub (int clubId, String accessToken) {
+         given(requestSpec)
+                .header("Authorization", accessToken)
+                .when()
+                .post("clubs/" + clubId + "/members/me/")
+                .then()
+                .spec(successfulClubSignup);
+    }
+
+    @Step("Вступление в клуб в котором пользователь уже состоит")
+    public SignUpClubAlreadySignedPostResponseBodyModel signupToSignedClub (int clubId, String accessToken) {
+        return given(requestSpec)
+                .header("Authorization", accessToken)
+                .when()
+                .post("clubs/" + clubId + "/members/me/")
+                .then()
+                .spec(unsuccessfulClubSignupAlreadySigned)
+                .extract().as(SignUpClubAlreadySignedPostResponseBodyModel.class);
     }
 }

@@ -1,4 +1,4 @@
-package tests;
+package tests.api;
 
 import models.login.LoginBodyModel;
 import models.logout.EmptyOrNullLogoutResponseModel;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tests.TestData.*;
+import static tests.api.TestData.*;
 
 public class LogoutTests extends TestBase {
 

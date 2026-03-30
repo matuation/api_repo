@@ -1,4 +1,4 @@
-package tests;
+package tests.api;
 
 import net.datafaker.Faker;
 
@@ -29,4 +29,7 @@ public class TestData {
     public static final String TELEGRAM_LINK = "https://t.me/+D0Dyz7lRd7djODQy";
     public static final String NEW_TELEGRAM_LINK = "https://t.me/+N3Wyz7lRd7djONEW";
     public static final String NO_CLUB_ERROR = "No Club matches the given query.";
+    public static final String NO_REVIEW_ERROR = "No BookReview matches the given query.";
+    public static final String NO_PERMISSION_ERROR = "You do not have permission to perform this action.";
+    public static final String ALREADY_SIGNED_ERROR = "User is already a member of this club.";
 }

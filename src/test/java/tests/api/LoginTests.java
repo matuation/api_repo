@@ -1,4 +1,4 @@
-package tests;
+package tests.api;
 
 import models.login.*;
 import org.junit.jupiter.api.DisplayName;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tests.TestData.*;
+import static tests.api.TestData.*;
 
 public class LoginTests extends TestBase {
 

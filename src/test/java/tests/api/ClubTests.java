@@ -1,7 +1,12 @@
-package tests;
+package tests.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import models.club.*;
+import models.localStorage.LocalStorageAuthRequestBody;
 import models.login.LoginBodyModel;
+import models.login.SuccessfulLoginResponseModel;
+import models.localStorage.UserData;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,11 +15,14 @@ import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tests.TestData.*;
+import static tests.api.TestData.*;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.*;
 
 public class ClubTests extends TestBase {
 
     String GENERATED_USERNAME;
+    String GENERATED_USERNAME_SECOND;
     String GENERATED_PASSWORD;
     String bookTitle;
     String newBookTitle;
@@ -28,6 +36,7 @@ public class ClubTests extends TestBase {
     @BeforeEach
     public void prepareTestData() {
         GENERATED_USERNAME = faker.name().firstName() + faker.name().maleFirstName();
+        GENERATED_USERNAME_SECOND = faker.name().firstName() + faker.name().maleFirstName() + "i";
         GENERATED_PASSWORD = faker.credentials().password();
         bookTitle = faker.book().title() + " " + faker.naruto().character() + " " + faker.battlefield1().weapon();
         newBookTitle = faker.book().title() + " " + faker.naruto().eye() + " " + faker.battlefield1().map();
@@ -82,7 +91,7 @@ public class ClubTests extends TestBase {
                         publicationYear, description, TELEGRAM_LINK), accessToken);
 
         GetClubResponseBodyModel getClubResponse =
-                api.club.clubGet(Integer.parseInt(createClubBodyModel.id()), accessToken);
+                api.club.clubGet(createClubBodyModel.id(), accessToken);
 
         step("Проверка значений полученного клуба", () -> {
             assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id());
@@ -103,8 +112,7 @@ public class ClubTests extends TestBase {
     @DisplayName("Успешное обновление книжного клуба")
     public void successfulClubPutUpdateTest() {
 
-        SuccessfulRegistrationResponseModel registrationResponse =
-                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
         String accessToken =
                 "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
@@ -116,7 +124,7 @@ public class ClubTests extends TestBase {
         UpdateClubPutRequestBodyModel updateClub = new UpdateClubPutRequestBodyModel(newBookTitle, newBookAuthors,
                 newPublicationYear, newDescription, NEW_TELEGRAM_LINK);
         UpdateClubPutResponseBodyModel updateClubBodyModel =
-                api.club.clubPutUpdate(Integer.parseInt(createClubBodyModel.id()), updateClub, accessToken);
+                api.club.clubPutUpdate(createClubBodyModel.id(), updateClub, accessToken);
 
         step("Проверка значений полученного клуба", () -> {
             assertThat(updateClubBodyModel.id()).isEqualTo(createClubBodyModel.id());
@@ -146,14 +154,97 @@ public class ClubTests extends TestBase {
                 api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
                         publicationYear, description, TELEGRAM_LINK), accessToken);
 
-        api.club.clubDelete(Integer.parseInt(createClubBodyModel.id()), accessToken);
+        api.club.clubDelete(createClubBodyModel.id(), accessToken);
         GetNotExistingClubResponseBodyModel getLostClub =
-                api.club.getNotExistingClub(Integer.parseInt(createClubBodyModel.id()), accessToken);
+                api.club.getNotExistingClub(createClubBodyModel.id(), accessToken);
 
         step("Проверка корректной ошибки", () -> {
             assertThat(getLostClub.detail()).isEqualTo(NO_CLUB_ERROR);
 
         });
+    }
+
+    @Test
+    @DisplayName("Вствупить в клуб")
+    public void successfulClubSignUp() {
+
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
+
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME_SECOND, GENERATED_PASSWORD));
+
+        String accessTokenSecond =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME_SECOND, GENERATED_PASSWORD));
+
+        api.club.signupToClub(createClubBodyModel.id(), accessTokenSecond);
+        
+    }
+
+    @Test
+    @DisplayName("Пользователь уже в клубе")
+    public void unsuccessfulClubSignUp() {
+
+        api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
+
+        SignUpClubAlreadySignedPostResponseBodyModel responseIfSignedAlready = api.club.signupToSignedClub(createClubBodyModel.id(), accessToken);
+
+        assertThat(responseIfSignedAlready.detail()).isEqualTo(ALREADY_SIGNED_ERROR);
+    }
+
+    @Test
+    @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
+    public void cantLeaveClubAsOwnerTest(){
+
+        SuccessfulRegistrationResponseModel registrationResponse =
+                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken =
+                "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        SuccessfulLoginResponseModel loginResponse = api.auth.login(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        UserData userData = new UserData(registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody
+                (userData, loginResponse.access(), loginResponse.refresh(), true);
+
+        String authJson;
+        try {
+            authJson = new ObjectMapper().writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Ошибка конвертации объекта в JSON", e);
+        }
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
+
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", authJson);
+        open("/clubs/" + createClubBodyModel.id());
+
+        // cant leave club as owner
+        $(".club-content").shouldBe(visible);
+        $(".leave-btn").click();
+        confirm();
+        $(".error").shouldHave(text("Не удалось покинуть клуб"));
     }
 
 }
