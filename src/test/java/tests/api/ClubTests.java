@@ -94,7 +94,7 @@ public class ClubTests extends TestBase {
                 api.club.clubGet(createClubBodyModel.id(), accessToken);
 
         step("Проверка значений полученного клуба", () -> {
-            assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id());
+            assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id() +"");
             assertThat(getClubResponse.bookTitle()).isEqualTo(createClubBodyModel.bookTitle());
             assertThat(getClubResponse.bookAuthors()).isEqualTo(createClubBodyModel.bookAuthors());
             assertThat(getClubResponse.publicationYear()).isEqualTo(createClubBodyModel.publicationYear());
@@ -127,7 +127,7 @@ public class ClubTests extends TestBase {
                 api.club.clubPutUpdate(createClubBodyModel.id(), updateClub, accessToken);
 
         step("Проверка значений полученного клуба", () -> {
-            assertThat(updateClubBodyModel.id()).isEqualTo(createClubBodyModel.id());
+            assertThat(updateClubBodyModel.id()).isEqualTo(createClubBodyModel.id() + "");
             assertThat(updateClubBodyModel.bookTitle()).isEqualTo(updateClub.bookTitle());
             assertThat(updateClubBodyModel.bookAuthors()).isEqualTo(updateClub.bookAuthors());
             assertThat(updateClubBodyModel.publicationYear()).isEqualTo(updateClub.publicationYear());
@@ -244,7 +244,7 @@ public class ClubTests extends TestBase {
         $(".club-content").shouldBe(visible);
         $(".leave-btn").click();
         confirm();
-        $(".error").shouldHave(text("Не удалось покинуть клуб"));
+        $(".error").shouldHave(text(CANT_LEAVE_ERROR));
     }
 
 }

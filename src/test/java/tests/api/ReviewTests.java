@@ -1,24 +1,32 @@
 package tests.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import models.club.CreateClubPostRequestBodyModel;
 import models.club.CreateClubPostResponseBodyModel;
+import models.localStorage.LocalStorageAuthRequestBody;
+import models.localStorage.UserData;
 import models.login.LoginBodyModel;
+import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
 import models.review.ReviewGetNotExistingResponseBodyModel;
 import models.review.ReviewGetResponseBodyModel;
 import models.review.ReviewPostRequestBodyModel;
 import models.review.ReviewPostResponseBodyModel;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import pages.ClubPage;
+import pages.components.DigitsToStarsComponent;
 
+import static com.codeborne.selenide.Condition.visible;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tests.api.TestData.*;
 
-public class ReviewTests extends TestBase{
+public class ReviewTests extends TestBase {
+
+    ClubPage clubPage = new ClubPage();
+    DigitsToStarsComponent convert = new DigitsToStarsComponent();
 
     String GENERATED_USERNAME;
     String GENERATED_USERNAME_NOT_MEMBER;
@@ -55,38 +63,41 @@ public class ReviewTests extends TestBase{
         newDescription = faker.book().genre() + " " + faker.book().publisher();
     }
 
-        @Test
-        @DisplayName("Успешное создание обзора")
-        public void successfulReviewCreationTest () {
+    @Test
+    @Tag("API")
+    @DisplayName("Успешное создание обзора")
+    public void successfulReviewCreationTest() {
 
-            SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-            String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
-            CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                    publicationYear, description, TELEGRAM_LINK);
-            CreateClubPostResponseBodyModel createClubBodyModel = api.club.clubCreate(createClub, accessToken);
+        CreateClubPostRequestBodyModel createClub = new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
+                publicationYear, description, TELEGRAM_LINK);
+        CreateClubPostResponseBodyModel createClubBodyModel = api.club.clubCreate(createClub, accessToken);
 
-            ReviewPostRequestBodyModel reviewBody = new ReviewPostRequestBodyModel(createClubBodyModel.id(), review,
-                    assessment, readPages);
-            ReviewPostResponseBodyModel reviewPost = api.review.reviewPost(reviewBody, accessToken);
+        ReviewPostRequestBodyModel reviewBody = new ReviewPostRequestBodyModel(createClubBodyModel.id(), review,
+                assessment, readPages);
+        ReviewPostResponseBodyModel reviewPost = api.review.reviewPost(reviewBody, accessToken);
 
-            step("Проверка значений созданного обзора", () -> {
-                assertThat(reviewPost.id()).isNotNull();
-                assertThat(reviewPost.club()).isEqualTo(createClubBodyModel.id());
-                assertThat(registrationResponse.id()).isEqualTo(reviewPost.user().get("id"));
-                assertThat(registrationResponse.username()).isEqualTo(reviewPost.user().get("username"));
-                assertThat(reviewPost.review()).isEqualTo(reviewBody.review());
-                assertThat(reviewPost.assessment()).isEqualTo(reviewBody.assessment());
-                assertThat(reviewPost.readPages()).isEqualTo(reviewBody.readPages());
-                assertThat(reviewPost.created()).isNotNull();
-                assertThat(reviewPost.modified()).isNull();
-            });
-        }
+
+        step("Проверка значений созданного обзора", () -> {
+            assertThat(reviewPost.id()).isNotNull();
+            assertThat(reviewPost.club()).isEqualTo(createClubBodyModel.id());
+            assertThat(registrationResponse.id()).isEqualTo(reviewPost.user().get("id"));
+            assertThat(registrationResponse.username()).isEqualTo(reviewPost.user().get("username"));
+            assertThat(reviewPost.review()).isEqualTo(reviewBody.review());
+            assertThat(reviewPost.assessment()).isEqualTo(reviewBody.assessment());
+            assertThat(reviewPost.readPages()).isEqualTo(reviewBody.readPages());
+            assertThat(reviewPost.created()).isNotNull();
+            assertThat(reviewPost.modified()).isNull();
+        });
+    }
 
     @Test
+    @Tag("API")
     @DisplayName("Успешное получение обзора")
-    public void successfulReviewGetTest () {
+    public void successfulReviewGetTest() {
 
         api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
@@ -116,8 +127,9 @@ public class ReviewTests extends TestBase{
     }
 
     @Test
+    @Tag("API")
     @DisplayName("Успешное обновление обзора")
-    public void successfulReviewPutUpdateTest () {
+    public void successfulReviewPutUpdateTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
@@ -129,7 +141,6 @@ public class ReviewTests extends TestBase{
 
         ReviewPostRequestBodyModel reviewBody = new ReviewPostRequestBodyModel(createClubBodyModel.id(), review,
                 assessment, readPages);
-
         ReviewPostResponseBodyModel reviewPost = api.review.reviewPost(reviewBody, accessToken);
 
         ReviewPostRequestBodyModel newReviewBody = new ReviewPostRequestBodyModel(createClubBodyModel.id(), newReview,
@@ -137,7 +148,7 @@ public class ReviewTests extends TestBase{
 
         ReviewPostResponseBodyModel newReviewPost = api.review.reviewPut(reviewPost.id(), newReviewBody, accessToken);
 
-        step("Проверка значений созданного обзора", () -> {
+        step("Проверка значений полученного обзора", () -> {
             assertThat(newReviewPost.id()).isEqualTo(reviewPost.id());
             assertThat(newReviewPost.club()).isEqualTo(reviewPost.club());
             assertThat(newReviewPost.user().get("id")).isEqualTo(registrationResponse.id());
@@ -152,8 +163,9 @@ public class ReviewTests extends TestBase{
 
 
     @Test
+    @Tag("API")
     @DisplayName("Неуспешное получение удалённого обзора")
-    public void unsuccessfulReviewCreationTest () {
+    public void unsuccessfulReviewCreationTest() {
 
         api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
@@ -161,26 +173,27 @@ public class ReviewTests extends TestBase{
 
         CreateClubPostResponseBodyModel createClubBodyModel =
                 api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                publicationYear, description, TELEGRAM_LINK), accessToken);
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
 
         ReviewPostResponseBodyModel reviewPost =
                 api.review.reviewPost(new ReviewPostRequestBodyModel(createClubBodyModel.id(), review,
-                assessment, readPages), accessToken);
+                        assessment, readPages), accessToken);
 
         api.review.reviewDelete(reviewPost.id(), accessToken);
 
         ReviewGetNotExistingResponseBodyModel reviewNotExist =
                 api.review.reviewGetUnsuccessful(reviewPost.id(), accessToken);
 
-        step("Проверка значений созданного обзора", () -> {
+        step("Проверка корректной ошибки", () -> {
             assertThat(reviewNotExist.detail()).isEqualTo(NO_REVIEW_ERROR);
         });
     }
 
     @Test
-    @Disabled("По факту пока не работает логика, задан вопрос в чат, тест не доделан, дописать пост запроса и првоерку")
+    @Tag("API")
+    @Disabled("По факту пока не работает логика, задан вопрос в чат, тест не доделан, дописать пост запроса и проверку")
     @DisplayName("Неуспешное создание обзора - пользователь не в клубе")
-    public void unsuccessfulReviewCreationNoRulesTest () {
+    public void unsuccessfulReviewCreationNoRulesTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse =
                 api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
@@ -190,7 +203,7 @@ public class ReviewTests extends TestBase{
 
         CreateClubPostResponseBodyModel createClubBodyModel =
                 api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle, bookAuthors,
-                publicationYear, description, TELEGRAM_LINK), accessToken);
+                        publicationYear, description, TELEGRAM_LINK), accessToken);
 
         api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME_NOT_MEMBER, GENERATED_PASSWORD));
 
@@ -199,17 +212,18 @@ public class ReviewTests extends TestBase{
 
         ReviewPostResponseBodyModel reviewPost =
                 api.review.reviewPost(new ReviewPostRequestBodyModel(createClubBodyModel.id(), review,
-                assessment, readPages), accessTokenSecond);
+                        assessment, readPages), accessTokenSecond);
 
-        step("Проверка значений созданного обзора", () -> {
+        step("Проверка ошибки", () -> {
             assertThat(reviewPost.id()).isNotNull();
 
         });
     }
 
     @Test
+    @Tag("API")
     @DisplayName("Неуспешное удаление обзора - обзор другого пользователя")
-    public void unsuccessfulReviewDeleteNoRulesTest () {
+    public void unsuccessfulReviewDeleteNoRulesTest() {
 
         api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 
@@ -234,7 +248,158 @@ public class ReviewTests extends TestBase{
         });
     }
 
+    @Test
+    @Tag("API+UI")
+    @DisplayName("UI + API Успешное создание обзора")
+    public void successfulReviewCreationUITest() {
+
+        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        SuccessfulLoginResponseModel loginResponse = api.auth.login(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        UserData userData = new UserData(registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody
+                (userData, loginResponse.access(), loginResponse.refresh(), true);
+
+        String authJson;
+        try {
+            authJson = new ObjectMapper().writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Ошибка конвертации объекта в JSON", e);
+        }
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle,
+                        bookAuthors,
+                        publicationYear,
+                        description,
+                        TELEGRAM_LINK), accessToken);
+
+        clubPage.openPage(authJson)
+                .openClubPage(createClubBodyModel.id())
+                .addReview()
+                .setAssessment(assessment + "")
+                .setReadPages(readPages + "")
+                .setReviewInput(review)
+                .saveButton()
+                .checkResult(clubPage.getReviewerName(), GENERATED_USERNAME)
+                .checkResult(clubPage.getReviewRating(), convert.digitsToStars(assessment))
+                .checkResult(clubPage.getReadPages(), readPages + " " + "стр.")
+                .checkResult(clubPage.getReviewContent(), review);
+
     }
+
+    @Test
+    @Tag("API+UI")
+    @DisplayName("UI + API Успешное обновление обзора")
+    public void successfulReviewPutUpdateUITest() {
+
+        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        SuccessfulLoginResponseModel loginResponse = api.auth.login(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        UserData userData = new UserData(registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody
+                (userData, loginResponse.access(), loginResponse.refresh(), true);
+
+        String authJson;
+        try {
+            authJson = new ObjectMapper().writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Ошибка конвертации объекта в JSON", e);
+        }
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle,
+                        bookAuthors,
+                publicationYear,
+                        description,
+                        TELEGRAM_LINK),
+                        accessToken);
+
+        api.review.reviewPost(new ReviewPostRequestBodyModel(createClubBodyModel.id(),
+                review,
+                assessment,
+                readPages),
+                accessToken);
+
+        clubPage.openPage(authJson)
+                .openClubPage(createClubBodyModel.id())
+                .editReview()
+                .setAssessment(newAssessment + "")
+                .setReadPages(newReadPages + "")
+                .setReviewInput(newReview)
+                .saveButton()
+                .checkResult(clubPage.getReviewerName(), GENERATED_USERNAME)
+                .checkResult(clubPage.getReviewRating(), convert.digitsToStars(newAssessment))
+                .checkResult(clubPage.getReadPages(), newReadPages + " " + "стр.")
+                .checkResult(clubPage.getReviewContent(), newReview);
+
+    }
+
+    @Test
+    @Tag("API+UI")
+    @DisplayName("UI + API Успешное обновление обзора")
+    public void successfulReviewDeleteUITest() {
+
+        SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        String accessToken = "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        SuccessfulLoginResponseModel loginResponse = api.auth.login(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
+
+        UserData userData = new UserData(registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody
+                (userData, loginResponse.access(), loginResponse.refresh(), true);
+
+        String authJson;
+        try {
+            authJson = new ObjectMapper().writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Ошибка конвертации объекта в JSON", e);
+        }
+
+        CreateClubPostResponseBodyModel createClubBodyModel =
+                api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle,
+                                bookAuthors,
+                                publicationYear,
+                                description,
+                                TELEGRAM_LINK),
+                        accessToken);
+
+        api.review.reviewPost(new ReviewPostRequestBodyModel(createClubBodyModel.id(),
+                        review,
+                        assessment,
+                        readPages),
+                accessToken);
+
+        clubPage.openPage(authJson)
+                .openClubPage(createClubBodyModel.id())
+                .deleteReview()
+                .getReview().shouldNotBe(visible);
+
+    }
+
+}
 
 
 

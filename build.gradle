@@ -34,6 +34,7 @@ dependencies {
             "io.rest-assured:rest-assured:$restAssuredVersion",
             "io.rest-assured:json-schema-validator:$restAssuredVersion",
             "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "io.qameta.allure:allure-selenide:$allureVersion",
             "com.fasterxml.jackson.core:jackson-databind:2.18.2",
             "net.datafaker:datafaker:2.5.4",
             "org.assertj:assertj-core:3.27.7",
@@ -45,12 +46,18 @@ dependencies {
 
 tasks.withType(Test) {
     useJUnitPlatform()
+    // Прокидываем системные свойства (для Owner)
     systemProperties(System.getProperties())
 
+    // Принудительная кодировка UTF-8
+    systemProperty "file.encoding", "UTF-8"
+    jvmArgs "-Dfile.encoding=UTF-8"
+
     testLogging {
+        showStandardStreams = true
         lifecycle {
-            events "started", "skipped", "failed", "standard_error", "standard_out"
-            exceptionFormat "short"
+            events "started", "skipped", "failed"
+            exceptionFormat "full"
         }
     }
 }

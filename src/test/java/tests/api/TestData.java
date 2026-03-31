@@ -32,4 +32,5 @@ public class TestData {
     public static final String NO_REVIEW_ERROR = "No BookReview matches the given query.";
     public static final String NO_PERMISSION_ERROR = "You do not have permission to perform this action.";
     public static final String ALREADY_SIGNED_ERROR = "User is already a member of this club.";
+    public static final String CANT_LEAVE_ERROR = "Не удалось покинуть клуб";
 }
