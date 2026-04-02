@@ -325,16 +325,16 @@ public class ReviewTests extends TestBase {
 
         CreateClubPostResponseBodyModel createClubBodyModel =
                 api.club.clubCreate(new CreateClubPostRequestBodyModel(bookTitle,
-                        bookAuthors,
-                publicationYear,
-                        description,
-                        TELEGRAM_LINK),
+                                bookAuthors,
+                                publicationYear,
+                                description,
+                                TELEGRAM_LINK),
                         accessToken);
 
         api.review.reviewPost(new ReviewPostRequestBodyModel(createClubBodyModel.id(),
-                review,
-                assessment,
-                readPages),
+                        review,
+                        assessment,
+                        readPages),
                 accessToken);
 
         clubPage.openPage(authJson)
@@ -353,7 +353,7 @@ public class ReviewTests extends TestBase {
 
     @Test
     @Tag("API+UI")
-    @DisplayName("UI + API Успешное обновление обзора")
+    @DisplayName("UI + API Успешное удаление обзора")
     public void successfulReviewDeleteUITest() {
 
         SuccessfulRegistrationResponseModel registrationResponse = api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));

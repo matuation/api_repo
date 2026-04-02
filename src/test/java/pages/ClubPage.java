@@ -9,7 +9,7 @@ import static com.codeborne.selenide.Selenide.*;
 public class ClubPage {
 
     private final SelenideElement addReviewButton = $(".add-review-btn"); //создаем переменные для хранения локаторов
-            private final SelenideElement assessmentInput = $("#assessment");
+    private final SelenideElement assessmentInput = $("#assessment");
     private final SelenideElement readPagesInput = $("#readPages");
     private final SelenideElement reviewInput = $("#review");
     private final SelenideElement saveButton = $(".save-btn");
@@ -17,7 +17,6 @@ public class ClubPage {
     private final SelenideElement reviewRating = $(".review-rating");
     private final SelenideElement readPages = $(".read-pages");
     private final SelenideElement reviewContent = $(".review-content");
-    private final SelenideElement reviewDate = $(".review-content");
     private final SelenideElement editReviewButton = $(".edit-review-btn");
     private final SelenideElement deleteReviewButton = $(".delete-review-btn");
     private final SelenideElement review = $(".review-card.user-review");
@@ -66,13 +65,6 @@ public class ClubPage {
         return this;
     }
 
-    @Step("Ввод количества страниц {value}")
-    public ClubPage setReadPages(String value) { //метод для имени
-        readPagesInput.setValue(value);
-
-        return this;
-    }
-
     @Step("Ввод текста обзора {value}")
     public ClubPage setReviewInput(String value) { //метод для имени
         reviewInput.setValue(value);
@@ -94,7 +86,6 @@ public class ClubPage {
         return this;
     }
 
-
     public SelenideElement getReviewerName() {
         return reviewerName;
     }
@@ -108,12 +99,15 @@ public class ClubPage {
         return readPages;
     }
 
-    public SelenideElement getReviewContent() {
-        return reviewContent;
+    @Step("Ввод количества страниц {value}")
+    public ClubPage setReadPages(String value) { //метод для имени
+        readPagesInput.setValue(value);
+
+        return this;
     }
 
-    public SelenideElement getReviewDate() {
-        return reviewDate;
+    public SelenideElement getReviewContent() {
+        return reviewContent;
     }
 
     public SelenideElement getReview() {
