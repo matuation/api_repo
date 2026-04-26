@@ -27,6 +27,10 @@ public class TestBase {
 
     @BeforeAll
     public static void setUp() {
+        System.out.println("--- DEBUG START ---");
+        System.out.println("remoteBaseUrl property: " + System.getProperty("remoteBaseUrl"));
+        System.out.println("browserVersion property: " + System.getProperty("browserVersion"));
+        System.out.println("--- DEBUG END ---");
         String remoteBaseUrl = System.getProperty("remoteBaseUrl");
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
