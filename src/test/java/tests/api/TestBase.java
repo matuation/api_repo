@@ -1,7 +1,7 @@
 package tests.api;
 
-import api.ApiClient;
 import allure.Attachments;
+import api.ApiClient;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
@@ -31,11 +31,11 @@ public class TestBase {
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
         if (remoteBaseUrl != null) {
-            Configuration.remote = "https://" + remoteBaseUsername + ":" + remoteBasePass + "@" + remoteBaseUrl;
+            Configuration.remote = "http://185.154.53.106";
         }
         Configuration.baseUrl = "https://book-club.qa.guru";
         Configuration.browser = browser;
-        Configuration.browserVersion = System.getProperty("browserVersion");
+        Configuration.browserVersion = System.getProperty("103.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
         Configuration.pageLoadStrategy = System.getProperty("pageLoadStrat", "eager");
         DesiredCapabilities capabilities = new DesiredCapabilities();
