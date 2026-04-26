@@ -4,20 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.club.*;
 import models.localStorage.LocalStorageAuthRequestBody;
+import models.localStorage.UserData;
 import models.login.LoginBodyModel;
 import models.login.SuccessfulLoginResponseModel;
-import models.localStorage.UserData;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.*;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tests.api.TestData.*;
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.*;
 
 public class ClubTests extends TestBase {
 
@@ -205,6 +207,7 @@ public class ClubTests extends TestBase {
     }
 
     @Test
+    @Tag("API+UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest(){
 
