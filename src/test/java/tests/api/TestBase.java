@@ -31,11 +31,11 @@ public class TestBase {
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
         if (remoteBaseUrl != null) {
-            Configuration.remote = "http://185.154.53.106";
+            Configuration.remote = "http://185.154.53.106:4444/wd/hub";
         }
         Configuration.baseUrl = "https://book-club.qa.guru";
         Configuration.browser = browser;
-        Configuration.browserVersion = System.getProperty("103.0");
+        Configuration.browserVersion = System.getProperty("browserVersion", "103.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
         Configuration.pageLoadStrategy = System.getProperty("pageLoadStrat", "eager");
         DesiredCapabilities capabilities = new DesiredCapabilities();
