@@ -61,3 +61,18 @@ tasks.withType(Test) {
         }
     }
 }
+// Задача для запуска API (исключаем комбинированные тесты)
+task runApiTests(type: Test) {
+    group = 'verification'
+    useJUnitPlatform {
+        excludeTags 'API+UI'
+    }
+}
+
+// Задача для запуска UI (только комбинированные тесты)
+task runUiTests(type: Test) {
+    group = 'verification'
+    useJUnitPlatform {
+        includeTags 'API+UI'
+    }
+}
