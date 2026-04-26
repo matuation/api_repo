@@ -59,6 +59,11 @@ public class TestBase {
             Attachments.pageSource();
             Attachments.browserConsoleLogs();
             Attachments.addVideo();
+            try {
+                Thread.sleep(2000); // только для дебага видео!
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             closeWebDriver();
         }
     }
