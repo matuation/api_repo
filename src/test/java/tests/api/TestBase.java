@@ -43,7 +43,7 @@ public class TestBase {
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
         Configuration.pageLoadStrategy = System.getProperty("pageLoadStrat", "eager");
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("selenoid:options", Map.<String, Object>of("enableVNC", true, "enableVideo", true));
+        capabilities.setCapability("selenoid:options", Map.<String, Object>of("enableVNC", true, "enableVideo", true, "videoName", "test_video.mp4"));
         Configuration.browserCapabilities = capabilities;
     }
 
