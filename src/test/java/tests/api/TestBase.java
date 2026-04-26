@@ -21,13 +21,13 @@ public class TestBase {
     public static String browser = System.getProperty("browser", "chrome");
     public static String remoteBaseUsername = System.getProperty("remoteBaseUsername");
     public static String remoteBasePass = System.getProperty("remoteBasePass");
-    public static String remoteBaseUrl = System.getProperty("remoteBaseUrl");
+
 
     protected static final ApiClient api = new ApiClient();
 
     @BeforeAll
     public static void setUp() {
-
+        String remoteBaseUrl = System.getProperty("remoteBaseUrl");
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
         if (remoteBaseUrl != null) {
