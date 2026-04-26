@@ -30,7 +30,7 @@ public class TestBase {
         String remoteBaseUrl = System.getProperty("remoteBaseUrl");
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
-        if (remoteBaseUrl != null) {
+        if (Boolean.getBoolean("remoteBaseUrl")) {
             Configuration.remote = "http://185.154.53.106:4444/wd/hub";
         }
         Configuration.baseUrl = "https://book-club.qa.guru";
