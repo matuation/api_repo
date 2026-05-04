@@ -5,8 +5,10 @@ import api.ApiClient;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
+import config.WebConfig;
 import io.qameta.allure.selenide.AllureSelenide;
 import io.restassured.RestAssured;
+import org.aeonbits.owner.ConfigFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,8 @@ import static com.codeborne.selenide.Selenide.closeWebDriver;
 
 public class TestBase {
 
+    private static final WebConfig config = ConfigFactory.create(WebConfig.class, System.getProperties());
+    
     public static String browser = System.getProperty("browser", "chrome");
     public static String remoteBaseUsername = System.getProperty("remoteBaseUsername");
     public static String remoteBasePass = System.getProperty("remoteBasePass");
@@ -27,15 +31,11 @@ public class TestBase {
 
     @BeforeAll
     public static void setUp() {
-        System.out.println("--- DEBUG START ---");
-        System.out.println("remoteBaseUrl property: " + System.getProperty("remoteBaseUrl"));
-        System.out.println("browserVersion property: " + System.getProperty("browserVersion"));
-        System.out.println("--- DEBUG END ---");
         String remoteBaseUrl = System.getProperty("remoteBaseUrl");
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
-        if (Boolean.getBoolean("remoteBaseUrl")) {
-            Configuration.remote = "http://185.154.53.106:4444/wd/hub";
+        if (config.isRemote()) {
+            Configuration.remote = "https://" + System.getProperty("remoteBaseUsername") + ":" + System.getProperty("remoteBasePass") + "@" + config.remoteUrl();
         }
         Configuration.baseUrl = "https://book-club.qa.guru";
         Configuration.browser = browser;
