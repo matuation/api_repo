@@ -38,6 +38,10 @@ Telegram <img src="https://github.com/matuation/silachclubLandingTest/blob/main/
 
 <img src="https://github.com/matuation/api_repo/blob/main/media/allure.png"/>
 
+Тесты для демонстрации возможности подготовить UI тест при помощи API запросов для внушительной экономии времени
+
+<img src="https://github.com/matuation/api_repo/blob/main/media/uiapi.png"/>
+
 ---
 
 ## Отчёт в Telegram при помощи бота
