@@ -46,7 +46,7 @@ public class Attachments {
     public static String addVideo(String sessionId) {
         String videoUrl = "https://selenoid.autotests.cloud/video/" + sessionId + ".mp4";
         return "<html><body><video width='100%' height='100%' controls autoplay><source src='"
-                + getVideoUrl()
+                + videoUrl
                 + "' type='video/mp4'></video></body></html>";
     }
 
