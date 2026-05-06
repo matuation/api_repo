@@ -3,6 +3,7 @@ package tests.api;
 import allure.Attachments;
 import api.ApiClient;
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import config.WebConfig;
@@ -49,15 +50,12 @@ public class TestBase {
     @AfterEach
     void addAttachments() {
         if (WebDriverRunner.hasWebDriverStarted()) {
+            String sessionId = Selenide.sessionId().toString();
             Attachments.screenshotAs("Скрин");
             Attachments.pageSource();
             Attachments.browserConsoleLogs();
-            Attachments.addVideo();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-            }
             closeWebDriver();
+            Attachments.addVideo(sessionId);
         }
     }
 }
