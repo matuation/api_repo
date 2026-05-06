@@ -54,6 +54,11 @@ public class TestBase {
             Attachments.screenshotAs("Скрин");
             Attachments.pageSource();
             Attachments.browserConsoleLogs();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Attachments.addVideo(sessionId);
             closeWebDriver();
         }
