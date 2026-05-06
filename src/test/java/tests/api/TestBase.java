@@ -54,8 +54,8 @@ public class TestBase {
             Attachments.screenshotAs("Скрин");
             Attachments.pageSource();
             Attachments.browserConsoleLogs();
-            closeWebDriver();
             Attachments.addVideo(sessionId);
+            closeWebDriver();
         }
     }
 }
