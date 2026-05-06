@@ -16,7 +16,7 @@
 
 ## Видео выполнения теста
 
-https://github.com/matuation/mobile_automation/blob/main/media/allurevideo.mp4
+https://github.com/user-attachments/assets/7d26cdd7-f15d-47b8-bf63-4e48cde8de11
 
 ---
 
