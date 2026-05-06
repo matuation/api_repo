@@ -195,9 +195,6 @@ public class ReviewTests extends TestBase {
     @DisplayName("Неуспешное создание обзора - пользователь не в клубе")
     public void unsuccessfulReviewCreationNoRulesTest() {
 
-        SuccessfulRegistrationResponseModel registrationResponse =
-                api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
-
         String accessToken =
                 "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));
 

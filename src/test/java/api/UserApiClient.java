@@ -12,7 +12,7 @@ import static specs.update.UpdateUserSpec.*;
 
 public class UserApiClient {
     @Step("Успешная регистрация")
-    public SuccessfulRegistrationResponseModel userRegistration (RegistrationBodyModel registrationData) {
+    public SuccessfulRegistrationResponseModel userRegistration(RegistrationBodyModel registrationData) {
         return given(requestSpec)
                 .body(registrationData)
                 .when()
@@ -24,7 +24,7 @@ public class UserApiClient {
     }
 
     @Step("Регистрация некорректного пользователя")
-    public WrongUserResponseModel incorrectUserRegistration (RegistrationBodyModel registrationData) {
+    public WrongUserResponseModel incorrectUserRegistration(RegistrationBodyModel registrationData) {
         return given(requestSpec)
                 .body(registrationData)
                 .when()
@@ -36,7 +36,7 @@ public class UserApiClient {
     }
 
     @Step("Регистрация пользователя с неправильным логином и паролем")
-    public WrongUsernameAndPasswordRegistrationResponseModel incorrectUserAndPasswordRegistration (RegistrationBodyModel registrationData) {
+    public WrongUsernameAndPasswordRegistrationResponseModel incorrectUserAndPasswordRegistration(RegistrationBodyModel registrationData) {
         return given(requestSpec)
                 .body(registrationData)
                 .when()
@@ -48,7 +48,7 @@ public class UserApiClient {
     }
 
     @Step("Регистрация пользователя без логина и пароля")
-    public WrongUsernameAndPasswordRegistrationResponseModel noUserAndPasswordRegistration (NoUsernameAndPasswordRegistrationRequestModel registrationData) {
+    public WrongUsernameAndPasswordRegistrationResponseModel noUserAndPasswordRegistration(NoUsernameAndPasswordRegistrationRequestModel registrationData) {
         return given(requestSpec)
                 .body(registrationData)
                 .when()
@@ -60,7 +60,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение пользователя методом PUT")
-    public SuccessfulPutUpdateResponseModel successfulUpdatePut (PutUpdateBodyModel putUpdateBody, String accessToken) {
+    public SuccessfulPutUpdateResponseModel successfulUpdatePut(PutUpdateBodyModel putUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
@@ -72,7 +72,7 @@ public class UserApiClient {
     }
 
     @Step("Неуспешное изменение пользователя методом PUT")
-    public WrongOrNoFieldsPutUpdateResponseModel unsuccessfulUpdatePut (PutUpdateBodyModel putUpdateBody, String accessToken) {
+    public WrongOrNoFieldsPutUpdateResponseModel unsuccessfulUpdatePut(PutUpdateBodyModel putUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(putUpdateBody)
                 .header("Authorization", accessToken)
@@ -120,7 +120,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение пользователя методом PATCH")
-    public SuccessfulPatchUpdateResponseModel successfulUpdatePatch (PatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel successfulUpdatePatch(PatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -132,7 +132,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение только username методом PATCH")
-    public SuccessfulPatchUpdateResponseModel successfulUsernameUpdatePatch (OnlyUsernamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel successfulUsernameUpdatePatch(OnlyUsernamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -144,7 +144,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение только FirstName методом PATCH")
-    public SuccessfulPatchUpdateResponseModel successfulFirstNameUpdatePatch (OnlyFirstNamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel successfulFirstNameUpdatePatch(OnlyFirstNamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -156,7 +156,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение только LastName методом PATCH")
-    public SuccessfulPatchUpdateResponseModel successfulLastNameUpdatePatch (OnlyLastNamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel successfulLastNameUpdatePatch(OnlyLastNamePatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -168,7 +168,7 @@ public class UserApiClient {
     }
 
     @Step("Успешное изменение только Email методом PATCH")
-    public SuccessfulPatchUpdateResponseModel successfulEmailNameUpdatePatch (OnlyEmailPatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel successfulEmailNameUpdatePatch(OnlyEmailPatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -180,19 +180,7 @@ public class UserApiClient {
     }
 
     @Step("Неуспешное изменение пользователя методом PATCH")
-    public WrongFieldsPatchUpdateResponseModel unsuccessfulUpdatePatch (PatchUpdateBodyModel patchUpdateBody, String accessToken) {
-        return given(requestSpec)
-                .body(patchUpdateBody)
-                .header("Authorization", accessToken)
-                .when()
-                .put("/users/me/")
-                .then()
-                .spec(emptyFieldsPatchUserUpdateSpec)
-                .extract().as(WrongFieldsPatchUpdateResponseModel.class);
-    }
-
-    @Step("Передача пустых строк методом PATCH")
-    public WrongFieldsPatchUpdateResponseModel unsuccessfulEmptyUpdatePatch (PatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public WrongFieldsPatchUpdateResponseModel unsuccessfulUpdatePatch(PatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)
@@ -204,7 +192,7 @@ public class UserApiClient {
     }
 
     @Step("Изменение без полей методом PATCH")
-    public SuccessfulPatchUpdateResponseModel unsuccessfulNoFieldsUpdatePatch (EmptyPatchUpdateBodyModel patchUpdateBody, String accessToken) {
+    public SuccessfulPatchUpdateResponseModel unsuccessfulNoFieldsUpdatePatch(EmptyPatchUpdateBodyModel patchUpdateBody, String accessToken) {
         return given(requestSpec)
                 .body(patchUpdateBody)
                 .header("Authorization", accessToken)

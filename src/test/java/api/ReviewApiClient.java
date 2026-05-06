@@ -1,8 +1,10 @@
 package api;
 
 import io.qameta.allure.Step;
-import models.club.GetClubResponseBodyModel;
-import models.review.*;
+import models.review.ReviewGetNotExistingResponseBodyModel;
+import models.review.ReviewGetResponseBodyModel;
+import models.review.ReviewPostRequestBodyModel;
+import models.review.ReviewPostResponseBodyModel;
 
 import static io.restassured.RestAssured.given;
 import static specs.login.LoginSpec.requestSpec;
@@ -23,7 +25,7 @@ public class ReviewApiClient {
     }
 
     @Step("Успешный просмотр обзора на книгу")
-    public ReviewGetResponseBodyModel reviewGet(int reviewId, String accessToken){
+    public ReviewGetResponseBodyModel reviewGet(int reviewId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -46,7 +48,7 @@ public class ReviewApiClient {
     }
 
     @Step("Успешное удаление обзора на книгу")
-    public void reviewDelete(int reviewId, String accessToken){
+    public void reviewDelete(int reviewId, String accessToken) {
         given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -56,7 +58,7 @@ public class ReviewApiClient {
     }
 
     @Step("Запрос просмотра несуществующего обзора на книгу")
-    public ReviewGetNotExistingResponseBodyModel reviewGetUnsuccessful(int reviewId, String accessToken){
+    public ReviewGetNotExistingResponseBodyModel reviewGetUnsuccessful(int reviewId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -67,7 +69,7 @@ public class ReviewApiClient {
     }
 
     @Step("Удаление чужого обзора на книгу")
-    public ReviewGetNotExistingResponseBodyModel reviewDeleteUnsuccessfulNoPermission(int reviewId, String accessToken){
+    public ReviewGetNotExistingResponseBodyModel reviewDeleteUnsuccessfulNoPermission(int reviewId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()

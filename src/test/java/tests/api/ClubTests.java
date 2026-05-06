@@ -96,7 +96,7 @@ public class ClubTests extends TestBase {
                 api.club.clubGet(createClubBodyModel.id(), accessToken);
 
         step("Проверка значений полученного клуба", () -> {
-            assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id() +"");
+            assertThat(getClubResponse.id()).isEqualTo(createClubBodyModel.id() + "");
             assertThat(getClubResponse.bookTitle()).isEqualTo(createClubBodyModel.bookTitle());
             assertThat(getClubResponse.bookAuthors()).isEqualTo(createClubBodyModel.bookAuthors());
             assertThat(getClubResponse.publicationYear()).isEqualTo(createClubBodyModel.publicationYear());
@@ -185,7 +185,7 @@ public class ClubTests extends TestBase {
                 "Bearer " + api.auth.loginAccessToken(new LoginBodyModel(GENERATED_USERNAME_SECOND, GENERATED_PASSWORD));
 
         api.club.signupToClub(createClubBodyModel.id(), accessTokenSecond);
-        
+
     }
 
     @Test
@@ -209,7 +209,7 @@ public class ClubTests extends TestBase {
     @Test
     @Tag("API+UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
-    public void cantLeaveClubAsOwnerTest(){
+    public void cantLeaveClubAsOwnerTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse =
                 api.user.userRegistration(new RegistrationBodyModel(GENERATED_USERNAME, GENERATED_PASSWORD));

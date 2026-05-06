@@ -84,8 +84,8 @@ public class ClubSpec {
     public static ResponseSpecification unsuccessfulClubSignupAlreadySigned = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(400)
-    .expectBody(matchesJsonSchemaInClasspath(
-            "schemas/club/not_exisiting_club_response_schema.json"))
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/club/not_exisiting_club_response_schema.json"))
             .expectBody("detail", notNullValue())
             .build();
 }

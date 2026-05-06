@@ -27,22 +27,22 @@ public class ReviewSpec {
             .expectBody("modified", nullValue())
             .build();
 
-public static ResponseSpecification successfulReviewGetResponseSpec = new ResponseSpecBuilder()
-        .log(ALL)
-        .expectStatusCode(200)
-        .expectBody(matchesJsonSchemaInClasspath(
-                "schemas/review/successful_get_post_review_response_schema.json"))
-        .expectBody("id", notNullValue())
-        .expectBody("club", notNullValue())
-        .expectBody("user", notNullValue())
-        .expectBody("user.id", notNullValue())
-        .expectBody("user.username", notNullValue())
-        .expectBody("review", notNullValue())
-        .expectBody("assessment", notNullValue())
-        .expectBody("readPages", notNullValue())
-        .expectBody("created", notNullValue())
-        .expectBody("modified", nullValue())
-        .build();
+    public static ResponseSpecification successfulReviewGetResponseSpec = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/review/successful_get_post_review_response_schema.json"))
+            .expectBody("id", notNullValue())
+            .expectBody("club", notNullValue())
+            .expectBody("user", notNullValue())
+            .expectBody("user.id", notNullValue())
+            .expectBody("user.username", notNullValue())
+            .expectBody("review", notNullValue())
+            .expectBody("assessment", notNullValue())
+            .expectBody("readPages", notNullValue())
+            .expectBody("created", notNullValue())
+            .expectBody("modified", nullValue())
+            .build();
 
     public static ResponseSpecification successfulReviewPutResponseSpec = new ResponseSpecBuilder()
             .log(ALL)

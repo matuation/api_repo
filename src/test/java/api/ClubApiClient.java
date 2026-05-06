@@ -2,7 +2,6 @@ package api;
 
 import io.qameta.allure.Step;
 import models.club.*;
-import models.review.ReviewPostResponseBodyModel;
 
 import static io.restassured.RestAssured.given;
 import static specs.club.ClubSpec.*;
@@ -10,7 +9,7 @@ import static specs.login.LoginSpec.requestSpec;
 
 public class ClubApiClient {
     @Step("Успешное создание книжного клуба")
-    public CreateClubPostResponseBodyModel clubCreate (CreateClubPostRequestBodyModel clubData, String accessToken) {
+    public CreateClubPostResponseBodyModel clubCreate(CreateClubPostRequestBodyModel clubData, String accessToken) {
         return given(requestSpec)
                 .body(clubData)
                 .header("Authorization", accessToken)
@@ -22,7 +21,7 @@ public class ClubApiClient {
     }
 
     @Step("Успешный просмотр созданного книжного клуба")
-    public GetClubResponseBodyModel clubGet (int clubId, String accessToken) {
+    public GetClubResponseBodyModel clubGet(int clubId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -33,7 +32,7 @@ public class ClubApiClient {
     }
 
     @Step("Успешное обновление книжного клуба")
-    public UpdateClubPutResponseBodyModel clubPutUpdate (int clubId, UpdateClubPutRequestBodyModel clubData, String accessToken) {
+    public UpdateClubPutResponseBodyModel clubPutUpdate(int clubId, UpdateClubPutRequestBodyModel clubData, String accessToken) {
         return given(requestSpec)
                 .body(clubData)
                 .header("Authorization", accessToken)
@@ -45,7 +44,7 @@ public class ClubApiClient {
     }
 
     @Step("Успешное удаление книжного клуба")
-    public void clubDelete (int clubId, String accessToken) {
+    public void clubDelete(int clubId, String accessToken) {
         given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -55,7 +54,7 @@ public class ClubApiClient {
     }
 
     @Step("Запрос несуществующего книжного клуба")
-    public GetNotExistingClubResponseBodyModel getNotExistingClub (int clubId, String accessToken) {
+    public GetNotExistingClubResponseBodyModel getNotExistingClub(int clubId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
@@ -66,8 +65,8 @@ public class ClubApiClient {
     }
 
     @Step("Вступление в клуб")
-    public void signupToClub (int clubId, String accessToken) {
-         given(requestSpec)
+    public void signupToClub(int clubId, String accessToken) {
+        given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()
                 .post("clubs/" + clubId + "/members/me/")
@@ -76,7 +75,7 @@ public class ClubApiClient {
     }
 
     @Step("Вступление в клуб в котором пользователь уже состоит")
-    public SignUpClubAlreadySignedPostResponseBodyModel signupToSignedClub (int clubId, String accessToken) {
+    public SignUpClubAlreadySignedPostResponseBodyModel signupToSignedClub(int clubId, String accessToken) {
         return given(requestSpec)
                 .header("Authorization", accessToken)
                 .when()

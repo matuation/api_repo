@@ -76,17 +76,6 @@ public class UpdateUserSpec {
             .expectBody("remoteAddr", notNullValue())
             .build();
 
-    public static ResponseSpecification wrongFieldsPatchUserUpdateSpec = new ResponseSpecBuilder()
-            .log(ALL)
-            .expectStatusCode(400)
-            .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/putUpdate/wrong_or_no_fields_put_update_response_schema.json"))
-            .expectBody("username", notNullValue())
-            .expectBody("firstName", notNullValue())
-            .expectBody("lastName", notNullValue())
-            .expectBody("email", notNullValue())
-            .build();
-
     public static ResponseSpecification emptyFieldsPatchUserUpdateSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(400)

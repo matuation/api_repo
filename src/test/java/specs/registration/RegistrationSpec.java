@@ -25,12 +25,4 @@ public class RegistrationSpec {
             .expectBody(matchesJsonSchemaInClasspath("schemas/registration/wrong_username_registration_response_schema.json"))
             .expectBody("username", notNullValue())
             .build();
-
-    public static ResponseSpecification wrongUsernameAndPasswordRegistrationResponseSpec = new ResponseSpecBuilder()
-            .log(ALL)
-            .expectStatusCode(400)
-            .expectBody(matchesJsonSchemaInClasspath("schemas/registration/wrong_username_and_password_registration_response_schema.json"))
-            .expectBody("username", notNullValue())
-            .expectBody("password", notNullValue())
-            .build();
 }
